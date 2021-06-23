@@ -23,6 +23,9 @@ namespace RakletTest
         public void Initiliaze()
         {
             driver = new ChromeDriver();
+            System.Environment.SetEnvironmentVariable("webdriver.chrome.driver", @"/home/ella/PycharmProjects");
+=========
+>>>>>>>>> Temporary merge branch 2
             ChromeOptions options = new ChromeOptions();
             options.AddExcludedArgument("disable-popup-blocking");
             options.AddUserProfilePreference("profile.default_content_setting_values.cookies", 2);
@@ -77,15 +80,15 @@ namespace RakletTest
 
         [TestMethod]
         public void TestReferences()
-        {
+            {
             IWebElement body = driver.GoToUrl(HomePage, "ApplicationContainer");
             driver.ClickText("References");
             TestLinks(body);
-        }
+                }
 
         [TestMethod]
         public void TestPricing()
-        {
+                {
             IWebElement body = driver.GoToUrl(HomePage, "ApplicationContainer");
             driver.ClickText("Pricing");
             TestLinks(body);
@@ -94,7 +97,7 @@ namespace RakletTest
             String xpath = "//*[@class=\"container\"]/div[2]/div[1]/div[1]/div[4]//";
             List<PriceClass> price_options = new List<PriceClass>();
             for (int i = 1; i <= 8; i++)
-            {
+                    {
                 PriceClass option = new PriceClass();
                 List<string> values = new List<string>();
 
@@ -111,7 +114,7 @@ namespace RakletTest
                     int temp_index = temp.IndexOf(":");
                     string var = temp.Substring(temp_index + 2);
                     values.Add(var);
-                }
+                    }
 
                 option.SetPrice(values[0]);
                 option.SetContacts(Convert.ToInt32(values[1]));
@@ -127,13 +130,15 @@ namespace RakletTest
                 option.SetEmailSender(values[5]);
                 option.SetAPILimits(values[6]);
                 price_options.Add(option);
+                }
             }
+        }
 
             //Store the elements in the table
             xpath = "//*[@class=\"table\"]";
             List<PriceClass> price_table = new List<PriceClass>();
             for (int i = 1; i <= 8; i++)
-            {
+        {
                 PriceClass option = new PriceClass();
                 List<string> values = new List<string>();
 
@@ -142,7 +147,7 @@ namespace RakletTest
 
                 int[] indexes = { 1, 3, 6, 45, 4, 9, 47 };
                 foreach (int index in indexes)
-                {
+            {
                     string temp = (driver.FindElement(By.XPath(xpath + "/tbody/tr[" + index + "]/td[5]")).Text);
                     values.Add(temp);
                 }
@@ -161,11 +166,11 @@ namespace RakletTest
                 option.SetEmailSender(values[5]);
                 option.SetAPILimits(values[6].Replace(",", ""));
                 price_table.Add(option);
-            }
+                    }
 
             //Compare the values
             for (int i = 0; i < 8; i++)
-            {
+                    {
                 PriceClass combobox = price_options[i];
                 PriceClass table = price_table[i];
 
@@ -232,13 +237,13 @@ namespace RakletTest
         }
 
         public void CheckEqual<T>(T expected, T actual, string message)
-        {
+                {
             try
-            {
+                    {
                 Assert.AreEqual(expected, actual);
-            }
+                    }
             catch (AssertFailedException)
-            {
+                    {
                 Console.WriteLine(message + " expected: " + expected + " actual: " + actual);
             }
         }
