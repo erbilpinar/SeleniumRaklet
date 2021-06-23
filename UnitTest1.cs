@@ -106,7 +106,7 @@ namespace RakletTest
 
                 int[] indexes = { 1, 2, 3, 4, 6, 15 };
                 foreach (int index in indexes)
-                    {
+                {
                     temp = (driver.FindElement(By.XPath(xpath + "div[4]/p[" + index + "]")).Text);
                     int temp_index = temp.IndexOf(":");
                     string var = temp.Substring(temp_index + 2);
@@ -128,7 +128,7 @@ namespace RakletTest
                 option.SetAPILimits(values[6]);
                 price_options.Add(option);
             }
-
+            
             //Store the elements in the table
             xpath = "//*[@class=\"table\"]";
             List<PriceClass> price_table = new List<PriceClass>();
