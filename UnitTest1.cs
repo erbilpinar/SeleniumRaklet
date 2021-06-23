@@ -106,7 +106,7 @@ namespace RakletTest
 
                 int[] indexes = { 1, 2, 3, 4, 6, 15 };
                 foreach (int index in indexes)
-                {
+                    {
                     temp = (driver.FindElement(By.XPath(xpath + "div[4]/p[" + index + "]")).Text);
                     int temp_index = temp.IndexOf(":");
                     string var = temp.Substring(temp_index + 2);
@@ -220,6 +220,15 @@ namespace RakletTest
                     }
                 }
             }
+
+            String xpath = "//*[@class=\"container\"]/div[2]/div[1]/div[1]/div[4]//";
+
+            for (int i = 1; i <= 8; i++)
+            {
+                var e = driver.FindElement(By.XPath(xpath + "select/option[" + i + "]"));
+                driver.ClickElement(e);
+                Console.WriteLine(driver.FindElement(By.XPath(xpath + "div[2]")).Text);
+            }           
         }
 
         public void CheckEqual<T>(T expected, T actual, string message)
@@ -233,6 +242,6 @@ namespace RakletTest
                 Console.WriteLine(message + " expected: " + expected + " actual: " + actual);
             }
         }
-
+    
     }
 }
