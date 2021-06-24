@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace RakletTest
 {
@@ -18,15 +19,15 @@ namespace RakletTest
                 WebDriverWait w = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
                 w.Until(ExpectedConditions.ElementExists(By.LinkText(linkText)));
                 driver.FindElement(By.LinkText(linkText)).Click();
-                Boolean b = CheckForPopup(driver);
+                CheckForPopup(driver);
             }
             catch (NoSuchElementException)
             {
-                throw new NoSuchElementException();
+                Assert.Fail("NoSuchElementException");
             }
             catch (TimeoutException)
             {
-                throw new TimeoutException();
+                Assert.Fail("TimeoutException");
             }
         }
 
@@ -38,40 +39,41 @@ namespace RakletTest
                 WebDriverWait w = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
                 w.Until(ExpectedConditions.ElementToBeClickable(element));
                 element.Click();
-                Boolean b = CheckForPopup(driver);
+                CheckForPopup(driver);
             }
             catch (NoSuchElementException)
             {
-                throw new NoSuchElementException();
+                Assert.Fail("NoSuchElementException");
             }
             catch (TimeoutException)
             {
-                throw new TimeoutException();
+                Assert.Fail("TimeoutException");
             }
         }
 
         /*Go to url and wait for the className element to appear and return the element */
         public static IWebElement GoToUrl(this IWebDriver driver, string url, string className)
         {
+            IWebElement body = null;
             try
             {
                 driver.Navigate().GoToUrl(@url);
                 WebDriverWait w = new WebDriverWait(driver, TimeSpan.FromSeconds(20));
                 w.Until(ExpectedConditions.ElementExists(By.ClassName(className)));
-                return driver.FindElement(By.ClassName(className));
+                body = driver.FindElement(By.ClassName(className));
             }
             catch (NoSuchElementException)
             {
-                throw new NoSuchElementException();
+                Assert.Fail("NoSuchElementException");
             }
             catch (TimeoutException)
             {
-                throw new TimeoutException();
+                Assert.Fail("TimeoutException");
             }
-
+            return body;
         }
 
-        public static Boolean CheckForPopup(IWebDriver driver)
+        public static void CheckForPopup(IWebDriver driver)
         {
             try
             {
@@ -80,17 +82,15 @@ namespace RakletTest
                 WebDriverWait w = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
                 w.Until(ExpectedConditions.ElementToBeClickable(e));
                 e.Click();
-                return true;
             }
             catch (NoSuchElementException)
             {
-                return false;
+                return;
             }
             catch (TimeoutException)
             {
-                throw new TimeoutException();
+                Assert.Fail("TimeoutException");
             }
-
         }
     }
 }
