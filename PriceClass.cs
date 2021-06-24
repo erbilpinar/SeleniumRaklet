@@ -8,80 +8,80 @@ namespace RakletTest
 {
     class PriceClass
     {
-        string price;
-        int contacts;
-        int custom_fields;
-        int storage;
-        string admins;
-        string email_sender;
-        string API_limits;
+        public string Price;
+        public int Contacts;
+        public int CustomFields;
+        public int Storage;
+        public string Admins;
+        public string EmailSender;
+        public string ApiLimits;
         public PriceClass()
         {
-            this.price = "";
-            this.contacts = 0;
-            this.custom_fields = 0;
-            this.storage = 0;
-            this.admins = "";
-            this.email_sender = "";
-            this.API_limits = "";
+            this.Price = "";
+            this.Contacts = 0;
+            this.CustomFields = 0;
+            this.Storage = 0;
+            this.Admins = "";
+            this.EmailSender = "";
+            this.ApiLimits = "";
         }
 
         //getters and setters
         public string GetPrice()
         {
-            return this.price;
+            return this.Price;
         }
         public int GetContacts()
         {
-            return this.contacts;
+            return this.Contacts;
         }
         public int GetCustomFields()
         {
-            return this.custom_fields;
+            return this.CustomFields;
         }
         public int GetStorage()
         {
-            return this.storage;
+            return this.Storage;
         }
         public string GetAdmins()
         {
-            return this.admins;
+            return this.Admins;
         }
         public string GetEmailSender()
         {
-            return this.email_sender;
+            return this.EmailSender;
         }
         public string GetAPILimits()
         {
-            return this.API_limits;
+            return this.ApiLimits;
         }
         public void SetPrice(string price)
         {
-            this.price = price;
+            this.Price = price;
         }
         public void SetContacts(int contacts)
         {
-            this.contacts = contacts;
+            this.Contacts = contacts;
         }
-        public void SetCustomFields(int custom_fields)
+        public void SetCustomFields(int customFields)
         {
-            this.custom_fields = custom_fields;
+            this.CustomFields = customFields;
         }
         public void SetStorage(int storage)
         {
-            this.storage = storage;
+            this.Storage = storage;
         }
         public void SetAdmins(string admins)
         {
-            this.admins = admins;
+            this.Admins = admins;
         }
-        public void SetEmailSender(string email_sender)
+        public void SetEmailSender(string emailSender)
         {
-            this.email_sender = email_sender;
+            this.EmailSender = emailSender;
         }
-        public void SetAPILimits(string API_limits)
+        public void SetAPILimits(string ApiLimits)
         {
-            this.API_limits = API_limits;
+            this.ApiLimits = ApiLimits;
         }
     }
 }

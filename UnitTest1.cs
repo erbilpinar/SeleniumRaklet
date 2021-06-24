@@ -17,12 +17,12 @@ namespace RakletTest
     public class UnitTest1
     {
         public const string HomePage = "https://hello.raklet.net/";
-        public static IWebDriver driver;
+        public static IWebDriver Driver;
 
         [TestInitialize]
         public void Initiliaze()
         {
-            driver = new ChromeDriver();
+            Driver = new ChromeDriver();
             ChromeOptions options = new ChromeOptions();
             options.AddExcludedArgument("disable-popup-blocking");
             options.AddUserProfilePreference("profile.default_content_setting_values.cookies", 2);
@@ -31,37 +31,37 @@ namespace RakletTest
         [TestCleanup]
         public void CleanUp()
         {
-            driver.Quit();
+            Driver.Quit();
         }
 
         [TestMethod]
         public void TestMain()
         {
-            IWebElement body = driver.GoToUrl(HomePage, "ApplicationContainer");
+            IWebElement body = Driver.GoToUrl(HomePage, "SectionHero");
             IList<IWebElement> href = body.FindElements(By.TagName("a"));
-            string originalWindow = driver.CurrentWindowHandle;
+            string originalWindow = Driver.CurrentWindowHandle;
 
             for (int i = 0; i < href.Count; i++)
             {
-                body = driver.GoToUrl(HomePage, "ApplicationContainer");
+                body = Driver.GoToUrl(HomePage, "SectionHero");
                 href = body.FindElements(By.TagName("a"));
                 string link = href[i].Text;
-                driver.ClickElement(href[i]);
-                if (driver.WindowHandles.Count > 1)
+                Driver.ClickElement(href[i]);
+                if (Driver.WindowHandles.Count > 1)
                 {
-                    driver.SwitchTo().Window(driver.WindowHandles[1]);
-                    driver.Close();
-                    driver.SwitchTo().Window(originalWindow);
+                    Driver.SwitchTo().Window(Driver.WindowHandles[1]);
+                    Driver.Close();
+                    Driver.SwitchTo().Window(originalWindow);
                 }
                 else
                 {
-                    if (driver.Url == HomePage)
+                    if (Driver.Url == HomePage)
                     {
                         System.Console.WriteLine("Empty link:" + link);
                     }
                     else
                     {
-                        driver.Navigate().Back();
+                        Driver.Navigate().Back();
                     }
                 }
             }
@@ -70,46 +70,46 @@ namespace RakletTest
         [TestMethod]
         public void TestFeatures()
         {
-            IWebElement body = driver.GoToUrl(HomePage, "ApplicationContainer");
-            driver.ClickText("Features");
-            TestLinks(body);
+            IWebElement body = Driver.GoToUrl(HomePage, "SectionHero");
+            Driver.ClickText("Features");
+            TestLinks(body, "Features-article");
         }
 
         [TestMethod]
         public void TestReferences()
         {
-            IWebElement body = driver.GoToUrl(HomePage, "ApplicationContainer");
-            driver.ClickText("References");
-            TestLinks(body);
+            IWebElement body = Driver.GoToUrl(HomePage, "SectionHero");
+            Driver.ClickText("References");
+            TestLinks(body, "Customers-verticals");
         }
 
         [TestMethod]
         public void TestPricing()
         {
-            IWebElement body = driver.GoToUrl(HomePage, "ApplicationContainer");
-            driver.ClickText("Pricing");
-            TestLinks(body);
+            IWebElement body = Driver.GoToUrl(HomePage, "SectionHero");
+            Driver.ClickText("Pricing");
+            TestLinks(body, "Pricing-content");
 
             // Store the elements in the combobox
-            String xpath = "//*[@class=\"container\"]/div[2]/div[1]/div[1]/div[4]//";
-            List<PriceClass> price_options = new List<PriceClass>();
+            String xpath = "//*[@class=\"col-auto\"]/div[1]/div[4]//";
+            List<PriceClass> priceOptions = new List<PriceClass>();
             for (int i = 1; i <= 8; i++)
             {
                 PriceClass option = new PriceClass();
                 List<string> values = new List<string>();
 
-                var e = driver.FindElement(By.XPath(xpath + "select/option[" + i + "]"));
-                driver.ClickElement(e);
+                var e = Driver.FindElement(By.XPath(xpath + "select/option[" + i + "]"));
+                Driver.ClickElement(e);
 
-                string temp = (driver.FindElement(By.XPath(xpath + "div[2]")).Text);
+                string temp = (Driver.FindElement(By.XPath(xpath + "div[2]")).Text);
                 values.Add(temp);
 
                 int[] indexes = { 1, 2, 3, 4, 6, 15 };
                 foreach (int index in indexes)
                 {
-                    temp = (driver.FindElement(By.XPath(xpath + "div[4]/p[" + index + "]")).Text);
-                    int temp_index = temp.IndexOf(":");
-                    string var = temp.Substring(temp_index + 2);
+                    temp = (Driver.FindElement(By.XPath(xpath + "div[4]/p[" + index + "]")).Text);
+                    int tempIndex = temp.IndexOf(":");
+                    string var = temp.Substring(tempIndex + 2);
                     values.Add(var);
                 }
 
@@ -126,24 +126,24 @@ namespace RakletTest
                 option.SetAdmins(values[4]);
                 option.SetEmailSender(values[5]);
                 option.SetAPILimits(values[6]);
-                price_options.Add(option);
+                priceOptions.Add(option);
             }
             
             //Store the elements in the table
             xpath = "//*[@class=\"table\"]";
-            List<PriceClass> price_table = new List<PriceClass>();
+            List<PriceClass> priceTable = new List<PriceClass>();
             for (int i = 1; i <= 8; i++)
             {
                 PriceClass option = new PriceClass();
                 List<string> values = new List<string>();
 
-                var e = driver.FindElement(By.XPath(xpath + "/thead/tr/th[5]/div/select/option[" + i + "]"));
-                driver.ClickElement(e);
+                var e = Driver.FindElement(By.XPath(xpath + "/thead/tr/th[5]/div/select/option[" + i + "]"));
+                Driver.ClickElement(e);
 
                 int[] indexes = { 1, 3, 6, 45, 4, 9, 47 };
                 foreach (int index in indexes)
                 {
-                    string temp = (driver.FindElement(By.XPath(xpath + "/tbody/tr[" + index + "]/td[5]")).Text);
+                    string temp = (Driver.FindElement(By.XPath(xpath + "/tbody/tr[" + index + "]/td[5]")).Text);
                     values.Add(temp);
                 }
 
@@ -160,14 +160,14 @@ namespace RakletTest
                 option.SetAdmins(values[4]);
                 option.SetEmailSender(values[5]);
                 option.SetAPILimits(values[6].Replace(",", ""));
-                price_table.Add(option);
+                priceTable.Add(option);
             }
 
             //Compare the values
             for (int i = 0; i < 8; i++)
             {
-                PriceClass combobox = price_options[i];
-                PriceClass table = price_table[i];
+                PriceClass combobox = priceOptions[i];
+                PriceClass table = priceTable[i];
 
                 CheckEqual(table.GetPrice(), combobox.GetPrice(), "Prices are not equal in selection: " + i);
                 CheckEqual(table.GetContacts(), combobox.GetContacts(), "Contact numbers are not equal in selection: " + i);
@@ -183,52 +183,44 @@ namespace RakletTest
         [TestMethod]
         public void TestResources()
         {
-            IWebElement body = driver.GoToUrl(HomePage, "ApplicationContainer");
-            driver.ClickText("Resources");
-            TestLinks(body);
+            IWebElement body = Driver.GoToUrl(HomePage, "SectionHero");
+            Driver.ClickText("Resources");
+            TestLinks(body, "LandingSection");
         }
 
 
-        public void TestLinks(IWebElement body)
+        public void TestLinks(IWebElement body, string verifyClass)
         {
             IList<IWebElement> href = body.FindElements(By.TagName("a"));
-            string originalWindow = driver.CurrentWindowHandle;
+            string originalWindow = Driver.CurrentWindowHandle;
 
             for (int i = 0; i < href.Count; i++)
             {
-                body = driver.FindElement(By.ClassName("ApplicationContainer"));
+                body = Driver.FindElement(By.ClassName(verifyClass));
                 href = body.FindElements(By.TagName("a"));
+                Console.WriteLine("here" + href[i].Text);
                 string link = href[i].Text;
-                driver.ClickElement(href[i]);
-                if (driver.WindowHandles.Count > 1)
+                Driver.ClickElement(href[i]);
+                if (Driver.WindowHandles.Count > 1)
                 {
-                    driver.SwitchTo().Window(driver.WindowHandles[1]);
-                    driver.Close();
-                    driver.SwitchTo().Window(originalWindow);
+                    Driver.SwitchTo().Window(Driver.WindowHandles[1]);
+                    Driver.Close();
+                    Driver.SwitchTo().Window(originalWindow);
                 }
                 else
                 {
-                    if (driver.Url == HomePage)
+                    if (Driver.Url == HomePage)
                     {
                         System.Console.WriteLine("Main link:" + link);
                     }
-                    driver.Navigate().Back();
-                    if (driver.Url == HomePage)
+                    Driver.Navigate().Back();
+                    if (Driver.Url == HomePage)
                     {
                         System.Console.WriteLine("Empty link:" + link);
-                        driver.Navigate().Forward();
+                        Driver.Navigate().Forward();
                     }
                 }
-            }
-
-            String xpath = "//*[@class=\"container\"]/div[2]/div[1]/div[1]/div[4]//";
-
-            for (int i = 1; i <= 8; i++)
-            {
-                var e = driver.FindElement(By.XPath(xpath + "select/option[" + i + "]"));
-                driver.ClickElement(e);
-                Console.WriteLine(driver.FindElement(By.XPath(xpath + "div[2]")).Text);
-            }           
+            }         
         }
 
         public void CheckEqual<T>(T expected, T actual, string message)
@@ -239,6 +231,7 @@ namespace RakletTest
             }
             catch (AssertFailedException)
             {
+                //Assert.Fail(message + " expected: " + expected + " actual: " + actual);
                 Console.WriteLine(message + " expected: " + expected + " actual: " + actual);
             }
         }
