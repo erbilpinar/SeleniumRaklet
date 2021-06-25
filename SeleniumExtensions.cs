@@ -92,5 +92,27 @@ namespace RakletTest
                 Assert.Fail("TimeoutException");
             }
         }
+
+        public static IWebElement CheckSiteLoaded(this IWebDriver driver, string verifyClass)
+        {
+            IWebElement element = null;
+            try
+            {
+                WebDriverWait w = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
+                w.Until(ExpectedConditions.ElementExists(By.ClassName(verifyClass)));
+                element = driver.FindElement(By.ClassName(verifyClass));
+            }
+            catch (NoSuchElementException)
+            {
+                Assert.Fail("NoSuchElementException");
+            }
+            catch (TimeoutException)
+            {
+                Assert.Fail("TimeoutException");
+            }
+            return element;
+
+        }
+
     }
 }
