@@ -11,7 +11,7 @@ namespace RakletTest
         public string Price;
         public int Contacts;
         public int CustomFields;
-        public int Storage;
+        public string Storage;
         public string Admins;
         public string EmailSender;
         public string ApiLimits;
@@ -20,7 +20,7 @@ namespace RakletTest
             this.Price = "";
             this.Contacts = 0;
             this.CustomFields = 0;
-            this.Storage = 0;
+            this.Storage = "";
             this.Admins = "";
             this.EmailSender = "";
             this.ApiLimits = "";
@@ -39,7 +39,7 @@ namespace RakletTest
         {
             return this.CustomFields;
         }
-        public int GetStorage()
+        public string GetStorage()
         {
             return this.Storage;
         }
@@ -67,7 +67,7 @@ namespace RakletTest
         {
             this.CustomFields = customFields;
         }
-        public void SetStorage(int storage)
+        public void SetStorage(string storage)
         {
             this.Storage = storage;
         }
