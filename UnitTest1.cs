@@ -90,10 +90,11 @@ namespace RakletTest
             Driver.ClickText("Pricing");
             //check for monhly prices
             var button = body.FindElement(By.XPath("//*[@id=\"switchToMonthlyPricesBtn\"]"));
-            CheckPremiumPrices();
-            CheckFreePrices();
-            CheckEssentialsPrices();
-            CheckProfessionalPrices();
+            Driver.ClickElement(button);
+            CheckPremiumPrices(true);
+            CheckFreePrices(true);
+            CheckEssentialsPrices(true);
+            CheckProfessionalPrices(true);
             
             body = Driver.GoToUrl(HomePage, "SectionHero");
             Driver.ClickText("Pricing");
@@ -109,6 +110,74 @@ namespace RakletTest
             TestLinks(body, "LandingSection");
         }
 
+        [TestMethod]
+        public void PriceComparisonMainAndPrices()
+        {
+            for (int i = 0; i < 2; i++)
+            {
+                IWebElement body = Driver.GoToUrl(HomePage, "SectionHero");
+                if (i == 1)
+                {
+                    var button = body.FindElement(By.XPath("//*[@id=\"switchToMonthlyPricesBtn\"]"));
+                    Driver.ClickElement(button);
+                }
+                //collect the prices on the main page
+                PriceClass freeMainPage = CheckFreePrices(false);
+                PriceClass essentialsMainPage = CheckEssentialsPrices(false);
+                PriceClass professionalMainPage = CheckProfessionalPrices(false);
+                List<PriceClass> premiumMainPage = CheckPremiumPrices(false);
+
+
+                //collect the prices on the pricing page
+                Driver.ClickText("Pricing");
+                if (i == 1)
+                {
+                    var button = body.FindElement(By.XPath("//*[@id=\"switchToMonthlyPricesBtn\"]"));
+                    Driver.ClickElement(button);
+
+                }
+                PriceClass freePricingPage = CheckFreePrices(false);
+                PriceClass essentialsPricingPage = CheckEssentialsPrices(false);
+                PriceClass professionalPricingPage = CheckProfessionalPrices(false);
+                List<PriceClass> premiumPricingPage = CheckPremiumPrices(false);
+
+                //compare them
+                //free part
+                CheckEqual(freeMainPage.Price, freePricingPage.Price);
+                CheckEqual(freeMainPage.Contacts, freePricingPage.Contacts);
+                CheckEqual(freeMainPage.CustomFields, freePricingPage.CustomFields);
+                CheckEqual(freeMainPage.Storage, freePricingPage.Storage);
+                CheckEqual(freeMainPage.Admins, freePricingPage.Admins);
+                //esesentials part
+                CheckEqual(essentialsMainPage.Price, essentialsPricingPage.Price);
+                CheckEqual(essentialsMainPage.Contacts, essentialsPricingPage.Contacts);
+                CheckEqual(essentialsMainPage.CustomFields, essentialsPricingPage.CustomFields);
+                CheckEqual(essentialsMainPage.Storage, essentialsPricingPage.Storage);
+                CheckEqual(essentialsMainPage.Admins, essentialsPricingPage.Admins);
+                CheckEqual(essentialsMainPage.EmailSender, essentialsPricingPage.EmailSender);
+                //professional
+                CheckEqual(professionalMainPage.Price, professionalPricingPage.Price);
+                CheckEqual(professionalMainPage.Contacts, professionalPricingPage.Contacts);
+                CheckEqual(professionalMainPage.CustomFields, professionalPricingPage.CustomFields);
+                CheckEqual(professionalMainPage.Storage, professionalPricingPage.Storage);
+                CheckEqual(professionalMainPage.Admins, professionalPricingPage.Admins);
+                CheckEqual(professionalMainPage.EmailSender, professionalPricingPage.EmailSender);
+                //premium
+                for (int j = 0; j < 8; j++)
+                {
+                    PriceClass combobox = premiumMainPage[j];
+                    PriceClass table = premiumPricingPage[j];
+
+                    CheckEqual(table.GetPrice(), combobox.GetPrice(), "Prices are not equal in PREMIUM selection: " + i  + "in main page and price page");
+                    CheckEqual(table.GetContacts(), combobox.GetContacts(), "Contact numbers are not equal in PREMIUM selection: " + i + "in main page and price page");
+                    CheckEqual(table.GetCustomFields(), combobox.GetCustomFields(), "Custom Field numbers are not equal in PREMIUM selection: " + i + "in main page and price page");
+                    CheckEqual(table.GetStorage(), combobox.GetStorage(), "Storages are not equal in PREMIUM selection: " + i + "in main page and price page");
+                    CheckEqual(table.GetAdmins(), combobox.GetAdmins(), "Admin numbers are not equal in PREMIUM selection: " + i + "in main page and price page");
+                    CheckEqual(table.GetEmailSender(), combobox.GetEmailSender(), "Email sender numbers are not equal in PREMIUM selection: " + i + "in main page and price page");
+                    CheckEqual(table.GetAPILimits(), combobox.GetAPILimits(), "API limits are not equal in PREMIUM selection: " + i + "in main page and price page");
+                }
+            }
+        }
 
         public void TestLinks(IWebElement body, string verifyClass)
         {
@@ -144,7 +213,7 @@ namespace RakletTest
             }         
         }
 
-        public void CheckEqual<T>(T expected, T actual, string message)
+        public void CheckEqual<T>(T expected, T actual, string message = "")
         {
             try
             {
@@ -157,7 +226,7 @@ namespace RakletTest
             }
         }
 
-        public void CheckPremiumPrices()
+        public List<PriceClass> CheckPremiumPrices(Boolean monthly)
         {
             // Store the elements in the combobox
             String xpath = "//*[@class=\"col-auto\"]/div[1]/div[4]//";
@@ -197,6 +266,8 @@ namespace RakletTest
                 option.SetAPILimits(values[6]);
                 priceOptions.Add(option);
             }
+
+            if (!monthly) return priceOptions;
             
             //Store the elements in the table
             xpath = "//*[@class=\"table\"]";
@@ -247,9 +318,10 @@ namespace RakletTest
                 CheckEqual(table.GetAPILimits(), combobox.GetAPILimits(), "API limits are not equal in PREMIUM selection: " + i);
 
             }
+            return priceOptions;
         }
 
-        public void CheckFreePrices()
+        public PriceClass CheckFreePrices(Boolean monthly)
         {
             // Store the elements in the combobox
             String xpath = "//*[@class=\"col-auto\"]/div[1]/div[1]//";
@@ -282,7 +354,9 @@ namespace RakletTest
             //option.SetEmailSender(Convert.ToInt32(values[5]));
             option.SetAdmins(values[4]);
             priceOptions.Add(option);
-           
+
+            if (!monthly) return priceOptions[0];
+
             //Store the elements in the table
             xpath = "//*[@class=\"table\"]";
             List<PriceClass> priceTable = new List<PriceClass>();
@@ -318,11 +392,12 @@ namespace RakletTest
             CheckEqual(table.GetCustomFields(), combobox.GetCustomFields(), "Custom Field numbers are not equal in FREE");
             CheckEqual(table.GetStorage(), combobox.GetStorage(), "Storages are not equal in FREE");
             CheckEqual(table.GetAdmins(), combobox.GetAdmins(), "Admin numbers are not equal in FREE");
-                
+
+            return combobox;
             
         }
 
-        public void CheckEssentialsPrices()
+        public PriceClass CheckEssentialsPrices(Boolean monthly)
         {
             // Store the elements in the combobox
             String xpath = "//*[@class=\"col-auto\"]/div[1]/div[2]//";
@@ -356,7 +431,9 @@ namespace RakletTest
             option.SetAdmins(values[4]);
             option.SetEmailSender(values[5]);
             priceOptions.Add(option);
-            
+
+            if (!monthly) return priceOptions[0];
+
             //Store the elements in the table
             xpath = "//*[@class=\"table\"]";
             List<PriceClass> priceTable = new List<PriceClass>();
@@ -394,9 +471,12 @@ namespace RakletTest
             CheckEqual(table.GetStorage(), combobox.GetStorage(), "Storages are not equal in ESSENTIALS");
             CheckEqual(table.GetAdmins(), combobox.GetAdmins(), "Admin numbers are not equal in ESSENTIALS");
             CheckEqual(table.GetEmailSender(), combobox.GetEmailSender(), "Email sender numbers are not equal in ESSENTIALS");
-            
+
+            return combobox;
+
         }
-        public void CheckProfessionalPrices()
+       
+        public PriceClass CheckProfessionalPrices(Boolean monthly)
         {
             // Store the elements in the combobox
             String xpath = "//*[@class=\"col-auto\"]/div[1]/div[3]//";
@@ -431,7 +511,8 @@ namespace RakletTest
             option.SetEmailSender(values[5]);
             priceOptions.Add(option);
 
-           
+            if (!monthly) return priceOptions[0];
+
             //Store the elements in the table
             xpath = "//*[@class=\"table\"]";
             List<PriceClass> priceTable = new List<PriceClass>();
@@ -469,7 +550,9 @@ namespace RakletTest
             CheckEqual(table.GetStorage(), combobox.GetStorage(), "Storages are not equal in ESSENTIALS");
             CheckEqual(table.GetAdmins(), combobox.GetAdmins(), "Admin numbers are not equal in ESSENTIALS");
             CheckEqual(table.GetEmailSender(), combobox.GetEmailSender(), "Email sender numbers are not equal in ESSENTIALS");
-            
+
+            return combobox;
+
         }
 
     }

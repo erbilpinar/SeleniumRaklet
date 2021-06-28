@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace RakletTest
 {
-    class PriceClass
+    public class PriceClass
     {
         public string Price;
         public int Contacts;
