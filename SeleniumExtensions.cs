@@ -16,7 +16,7 @@ namespace RakletTest
         {
             try
             {
-                WebDriverWait w = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
+                WebDriverWait w = new WebDriverWait(driver, TimeSpan.FromSeconds(20));
                 w.Until(ExpectedConditions.ElementExists(By.LinkText(linkText)));
                 driver.FindElement(By.LinkText(linkText)).Click();
                 CheckForPopup(driver);
@@ -36,7 +36,7 @@ namespace RakletTest
         {
             try
             {
-                WebDriverWait w = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
+                WebDriverWait w = new WebDriverWait(driver, TimeSpan.FromSeconds(20));
                 w.Until(ExpectedConditions.ElementToBeClickable(element));
                 element.Click();
                 CheckForPopup(driver);
@@ -93,12 +93,12 @@ namespace RakletTest
             }
         }
 
-        public static IWebElement CheckSiteLoaded(this IWebDriver driver, string verifyClass)
+        public static IWebElement CheckSiteLoaded(this IWebDriver driver, string verifyClass, int time = 10)
         {
             IWebElement element = null;
             try
             {
-                WebDriverWait w = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
+                WebDriverWait w = new WebDriverWait(driver, TimeSpan.FromSeconds(time));
                 w.Until(ExpectedConditions.ElementExists(By.ClassName(verifyClass)));
                 element = driver.FindElement(By.ClassName(verifyClass));
             }

@@ -9,6 +9,8 @@ using System.Diagnostics;
 using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Support.UI;
+using System.IO;
+
 
 
 namespace RakletTest
@@ -17,6 +19,9 @@ namespace RakletTest
     public class UnitTest1
     {
         public const string HomePage = "https://hello.raklet.net/";
+        public string LoginEmail = "perbil18@ku.edu.tr";
+        public string LoginPassword = "rakletdemo123";
+
         public static IWebDriver Driver;
         public List<string> ErrorLogs;
         
@@ -24,9 +29,13 @@ namespace RakletTest
         public void Initiliaze()
         {
             ErrorLogs = new List<string>();
-            Driver = new ChromeDriver();
+            //Driver = new ChromeDriver();
             ChromeOptions options = new ChromeOptions();
             options.AddExcludedArgument("disable-popup-blocking");
+            var chromeOptions = new ChromeOptions();
+            chromeOptions.AddArguments(new List<string>() { "--headless", "--disable-gpu", "--window-size=1920,1200"});
+            var chromeDriverService = ChromeDriverService.CreateDefaultService();
+            Driver = new ChromeDriver(chromeDriverService, chromeOptions);
         }
 
         [TestCleanup]
@@ -55,11 +64,18 @@ namespace RakletTest
         {
             IWebElement body = Driver.GoToUrl(HomePage, "SectionHero");
             IList<IWebElement> href = body.FindElements(By.TagName("a"));
-            string originalWindow = Driver.CurrentWindowHandle;
 
             for (int i = 0; i < href.Count; i++)
             {
-                body = Driver.GoToUrl(HomePage, "SectionHero");
+                body = Driver.CheckSiteLoaded("SectionHero");
+                href = body.FindElements(By.TagName("a"));
+                string link = href[i].GetProperty("href");
+                string onclick = href[i].GetProperty("onclick");
+                if (link == "#" && onclick == null)
+                {
+                    ErrorLogs.Add("link is empty: " + href[i].Text);
+                }
+                /*body = Driver.GoToUrl(HomePage, "SectionHero");
                 href = body.FindElements(By.TagName("a"));
                 string link = href[i].Text;
                 Driver.ClickElement(href[i]);
@@ -79,7 +95,7 @@ namespace RakletTest
                     {
                         Driver.Navigate().Back();
                     }
-                }
+                }*/
             }
         }
 
@@ -199,7 +215,7 @@ namespace RakletTest
         public void TestLinks(IWebElement body, string verifyClass)
         {
             IList<IWebElement> href = body.FindElements(By.TagName("a"));
-            string originalWindow = Driver.CurrentWindowHandle;
+            //string originalWindow = Driver.CurrentWindowHandle;
 
             for (int i = 0; i < href.Count; i++)
             {   
@@ -552,5 +568,67 @@ namespace RakletTest
             return combobox;
 
         }
+    
+        [TestMethod]
+        public void TestLogin()
+        {
+            Driver.GoToUrl(HomePage, "SectionHero");
+            String xpath = "//*[@class=\"navbar-auth-login\"]";
+            IWebElement b = (Driver.FindElement(By.XPath(xpath)));
+            Driver.ClickElement(b);
+            Driver.CheckSiteLoaded("form-horizontal");
+
+            //test without cookies
+            //e-mail part
+            IWebElement email = (Driver.FindElement(By.Id("Email")));
+            email.Clear();
+            email.SendKeys(LoginEmail);
+            xpath = "//*[@id=\"loginForm\"]/form/div[2]/div";
+            Driver.FindElement(By.XPath(xpath)).Click();
+            Driver.CheckSiteLoaded("RememberMeCheck");
+
+            //password part
+            IWebElement password = (Driver.FindElement(By.Id("Password")));
+            password.Clear();
+            password.SendKeys(LoginPassword);
+            xpath = "//*[@id=\"loginForm\"]/form/div[3]/div/input";
+            Driver.FindElement(By.XPath(xpath)).Click();
+            Driver.CheckSiteLoaded("Manager-HeaderSubmenuLogo", 30);
+
+            Driver.Quit();
+            Initiliaze();
+
+            //test with cookies
+            Driver.GoToUrl(HomePage, "SectionHero");
+            Cookie cookie = GetCookie();
+            Driver.Manage().Cookies.AddCookie(cookie);
+
+            xpath = "//*[@class=\"navbar-auth-login\"]";
+            b = (Driver.FindElement(By.XPath(xpath)));
+            Driver.ClickElement(b);
+            Driver.CheckSiteLoaded("Manager-HeaderSubmenuLogo", 30);
+        }
+
+        public Cookie GetCookie()
+        {
+            Cookie cookie = null;
+            try
+            {
+                StreamReader reader = new StreamReader("../../cookie.txt");
+                String name = reader.ReadLine();
+                String value = reader.ReadLine();
+                reader.Close();
+                //expires = Wed 07 / 14 / 2021 13:19:53 UTC; path =/; domain =.raklet.net; secure; httpOnly
+                DateTime time = new DateTime(2021, 07, 14, 13, 19, 53);
+                cookie = new Cookie(name.Trim(), value.Trim(), ".raklet.net", "/", time);                
+            }
+            catch
+            {
+                Assert.Fail("Cannot find the file");
+
+            }
+            return cookie; 
+        }
+
     }
 }
