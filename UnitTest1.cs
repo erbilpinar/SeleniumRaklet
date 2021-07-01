@@ -24,7 +24,7 @@ namespace RakletTest
 
         public static IWebDriver Driver;
         public List<string> ErrorLogs;
-        
+
         [TestInitialize]
         public void Initiliaze()
         {
@@ -33,7 +33,7 @@ namespace RakletTest
             ChromeOptions options = new ChromeOptions();
             options.AddExcludedArgument("disable-popup-blocking");
             var chromeOptions = new ChromeOptions();
-            chromeOptions.AddArguments(new List<string>() { "--headless", "--disable-gpu", "--window-size=1920,1200"});
+            chromeOptions.AddArguments(new List<string>() { "--headless", "--disable-gpu", "--window-size=1920,1200" });
             var chromeDriverService = ChromeDriverService.CreateDefaultService();
             Driver = new ChromeDriver(chromeDriverService, chromeOptions);
         }
@@ -44,7 +44,7 @@ namespace RakletTest
             Driver.Quit();
             CheckForErrors();
         }
-        
+
         public void CheckForErrors()
         {
             if (ErrorLogs.Count > 0)
@@ -187,7 +187,7 @@ namespace RakletTest
                     PriceClass combobox = premiumMainPage[j];
                     PriceClass table = premiumPricingPage[j];
 
-                    CheckEqual(table.Price, combobox.Price, "Prices are not equal in PREMIUM selection: " + i  + "in main page and price page");
+                    CheckEqual(table.Price, combobox.Price, "Prices are not equal in PREMIUM selection: " + i + "in main page and price page");
                     CheckEqual(table.Contacts, combobox.Contacts, "Contact numbers are not equal in PREMIUM selection: " + i + "in main page and price page");
                     CheckEqual(table.CustomFields, combobox.CustomFields, "Custom Field numbers are not equal in PREMIUM selection: " + i + "in main page and price page");
                     CheckEqual(table.Storage, combobox.Storage, "Storages are not equal in PREMIUM selection: " + i + "in main page and price page");
@@ -211,14 +211,14 @@ namespace RakletTest
             CheckEssentialsPrices(true);
             CheckProfessionalPrices(true);
         }
-        
+
         public void TestLinks(IWebElement body, string verifyClass)
         {
             IList<IWebElement> href = body.FindElements(By.TagName("a"));
             //string originalWindow = Driver.CurrentWindowHandle;
 
             for (int i = 0; i < href.Count; i++)
-            {   
+            {
                 body = Driver.CheckSiteLoaded(verifyClass);
                 href = body.FindElements(By.TagName("a"));
                 string link = href[i].GetProperty("href");
@@ -250,7 +250,7 @@ namespace RakletTest
                 }*/
             }
         }
-        
+
         public void CheckEqual<T>(T expected, T actual, string message)
         {
             try
@@ -302,7 +302,7 @@ namespace RakletTest
             }
 
             if (!monthly) return priceOptions;
-            
+
             //Store the elements in the table
             xpath = "//*[@class=\"table\"]";
             List<PriceClass> priceTable = new List<PriceClass>();
@@ -356,14 +356,14 @@ namespace RakletTest
             // Store the elements in the combobox
             String xpath = "//*[@class=\"col-auto\"]/div[1]/div[1]//";
             List<PriceClass> priceOptions = new List<PriceClass>();
-            
+
             PriceClass option = new PriceClass();
             List<string> values = new List<string>();
 
             string temp = (Driver.FindElement(By.XPath(xpath + "div[2]")).Text);
             values.Add(temp);
 
-            int[] indexes = { 1, 2, 3, 4};
+            int[] indexes = { 1, 2, 3, 4 };
             foreach (int index in indexes)
             {
                 temp = (Driver.FindElement(By.XPath(xpath + "div[4]/p[" + index + "]")).Text);
@@ -387,11 +387,11 @@ namespace RakletTest
             //Store the elements in the table
             xpath = "//*[@class=\"table\"]";
             List<PriceClass> priceTable = new List<PriceClass>();
-                
+
             option = new PriceClass();
             values = new List<string>();
 
-            int[] indexes2 = { 1, 3, 6, 45, 4};
+            int[] indexes2 = { 1, 3, 6, 45, 4 };
             foreach (int index in indexes2)
             {
                 temp = (Driver.FindElement(By.XPath(xpath + "/tbody/tr[" + index + "]/td[2]")).Text);
@@ -407,19 +407,19 @@ namespace RakletTest
             option.Storage = var;
             option.Admins = values[4];
             priceTable.Add(option);
-               
+
             //Compare the values
             PriceClass combobox = priceOptions[0];
             PriceClass table = priceTable[0];
 
             CheckEqual(table.Price, combobox.Price, "Prices are not equal in FREE");
-            CheckEqual(table.Contacts, combobox.Contacts, "Contact numbers are not equal in FREE" );
+            CheckEqual(table.Contacts, combobox.Contacts, "Contact numbers are not equal in FREE");
             CheckEqual(table.CustomFields, combobox.CustomFields, "Custom Field numbers are not equal in FREE");
             CheckEqual(table.Storage, combobox.Storage, "Storages are not equal in FREE");
             CheckEqual(table.Admins, combobox.Admins, "Admin numbers are not equal in FREE");
 
             return combobox;
-            
+
         }
 
         public PriceClass CheckEssentialsPrices(Boolean monthly)
@@ -495,7 +495,7 @@ namespace RakletTest
             return combobox;
 
         }
-       
+
         public PriceClass CheckProfessionalPrices(Boolean monthly)
         {
             // Store the elements in the combobox
@@ -543,7 +543,7 @@ namespace RakletTest
                 temp = (Driver.FindElement(By.XPath(xpath + "/tbody/tr[" + index + "]/td[4]")).Text);
                 values.Add(temp);
             }
-           
+
             option.Price = values[0].Replace(",", "").Replace(".00", "");
             option.Contacts = Convert.ToInt32(values[1].Replace(",", ""));
             option.CustomFields = Convert.ToInt32(values[2]);
@@ -568,17 +568,142 @@ namespace RakletTest
             return combobox;
 
         }
-    
+
         [TestMethod]
         public void TestLogin()
         {
+            LoginWithoutCookies();
+            Driver.Quit();
+            Initiliaze();
+            LoginWithCookies();
+        }
+
+        [TestMethod]
+        public void TestAccountBilling()
+        {
+            LoginWithCookies();
+            String xpath = "//*[@class=\"Manager-navigationAccount\"]/li[3]/a";
+            Driver.ClickElement(Driver.FindElement(By.XPath(xpath)));
+            xpath = "//*[@class=\"Manager-navigationAccount\"]/li[3]/div/a";
+            Driver.ClickElement(Driver.FindElement(By.XPath(xpath + "[" + 1 + "]")));
+            IWebElement body = Driver.CheckSiteLoaded("ManagerContent-body");
+            TestLinks(body, "Reports");
+
+        }
+
+        [TestMethod]
+        public void TestAccountReports()
+        {
+            LoginWithCookies();
+            String xpath = "//*[@class=\"Manager-navigationAccount\"]/li[3]/a";
+            Driver.ClickElement(Driver.FindElement(By.XPath(xpath)));
+            xpath = "//*[@class=\"Manager-navigationAccount\"]/li[3]/div/a";
+            Driver.ClickElement(Driver.FindElement(By.XPath(xpath + "[" + 2 + "]")));
+            IWebElement body = Driver.CheckSiteLoaded("ManagerContent-body");
+            TestLinks(body, "Reports");
+
+        }
+
+        [TestMethod]
+        public void TestAccountSettings()
+        {
+            LoginWithCookies();
+            String xpath = "//*[@class=\"Manager-navigationAccount\"]/li[3]/a";
+            Driver.ClickElement(Driver.FindElement(By.XPath(xpath)));
+            xpath = "//*[@class=\"Manager-navigationAccount\"]/li[3]/div/a";
+            Driver.ClickElement(Driver.FindElement(By.XPath(xpath + "[" + 3 + "]")));
+            IWebElement body = Driver.CheckSiteLoaded("ManagerContent-body");
+            TestLinks(body, "Settings");
+        }
+
+        [TestMethod]
+        public void TestAccountMyProfile()
+        {
+            LoginWithCookies();
+            String xpath = "//*[@class=\"Manager-navigationAccount\"]/li[3]/a";
+            Driver.ClickElement(Driver.FindElement(By.XPath(xpath)));
+            xpath = "//*[@class=\"Manager-navigationAccount\"]/li[3]/div/a";
+            Driver.ClickElement(Driver.FindElement(By.XPath(xpath + "[" + 4 + "]")));
+            IWebElement body = Driver.CheckSiteLoaded("SocialContent");
+            TestLinks(body, "ProfileHeader");
+
+        }
+
+        [TestMethod]
+        public void TestAccountNewOrganization()
+        {
+            LoginWithCookies();
+            String xpath = "//*[@class=\"Manager-navigationAccount\"]/li[3]/a";
+            Driver.ClickElement(Driver.FindElement(By.XPath(xpath)));
+            xpath = "//*[@class=\"Manager-navigationAccount\"]/li[3]/div/a";
+            Driver.ClickElement(Driver.FindElement(By.XPath(xpath + "[" + 5 + "]")));
+            IWebElement body = Driver.CheckSiteLoaded("Login-content");
+            TestLinks(body, "Signup");
+        }
+
+        [TestMethod]
+        public void TestAccountLogout()
+        {
+            LoginWithCookies();
+            String xpath = "//*[@class=\"Manager-navigationAccount\"]/li[3]/a";
+            Driver.ClickElement(Driver.FindElement(By.XPath(xpath)));
+            xpath = "//*[@class=\"Manager-navigationAccount\"]/li[3]/div/a";
+            Driver.ClickElement(Driver.FindElement(By.XPath(xpath + "[" + 7 + "]")));
+            string text = Driver.CheckSiteLoaded("alert").Text;
+            Console.WriteLine(text);
+            CheckEqual(text, "You have been successfully logged out.", "Cannot logged out sucessfully");
+            
+        }
+
+        [TestMethod]
+        public void TestAccountHelpCenter()
+        {
+            LoginWithCookies();
+            String xpath = "//*[@class=\"Manager-navigationAccount\"]/li[2]/a";
+            Driver.ClickElement(Driver.FindElement(By.XPath(xpath)));
+            IWebElement body = Driver.CheckSiteLoaded("ManagerContent-body");
+            TestLinks(body, "ProgressBar");
+        }
+
+        [TestMethod]
+        public void TestAccountSite()
+        {
+            LoginWithCookies();
+            String xpath = "//*[@class=\"Manager-navigationAccount\"]/li[1]/a";
+            Driver.ClickElement(Driver.FindElement(By.XPath(xpath)));
+            IWebElement body = Driver.CheckSiteLoaded("SocialContent");
+            TestLinks(body, "SocialContent-bodyWithMenu");
+        }
+
+        public Cookie GetCookie()
+        {
+            Cookie cookie = null;
+            try
+            {
+                StreamReader reader = new StreamReader("../../cookie.txt");
+                String name = reader.ReadLine();
+                String value = reader.ReadLine();
+                reader.Close();
+                //expires = Wed 07 / 14 / 2021 13:19:53 UTC; path =/; domain =.raklet.net; secure; httpOnly
+                DateTime time = new DateTime(2021, 07, 14, 13, 19, 53);
+                cookie = new Cookie(name.Trim(), value.Trim(), ".raklet.net", "/", time);
+            }
+            catch
+            {
+                Assert.Fail("Cannot find the file");
+
+            }
+            return cookie;
+        }
+
+        public void LoginWithoutCookies()
+        {
             Driver.GoToUrl(HomePage, "SectionHero");
-            String xpath = "//*[@class=\"navbar-auth-login\"]";
+            string xpath = "//*[@class=\"navbar-auth-login\"]";
             IWebElement b = (Driver.FindElement(By.XPath(xpath)));
             Driver.ClickElement(b);
             Driver.CheckSiteLoaded("form-horizontal");
 
-            //test without cookies
             //e-mail part
             IWebElement email = (Driver.FindElement(By.Id("Email")));
             email.Clear();
@@ -594,41 +719,18 @@ namespace RakletTest
             xpath = "//*[@id=\"loginForm\"]/form/div[3]/div/input";
             Driver.FindElement(By.XPath(xpath)).Click();
             Driver.CheckSiteLoaded("Manager-HeaderSubmenuLogo", 30);
+        }
 
-            Driver.Quit();
-            Initiliaze();
-
-            //test with cookies
+        public void LoginWithCookies()
+        {
             Driver.GoToUrl(HomePage, "SectionHero");
             Cookie cookie = GetCookie();
             Driver.Manage().Cookies.AddCookie(cookie);
 
-            xpath = "//*[@class=\"navbar-auth-login\"]";
-            b = (Driver.FindElement(By.XPath(xpath)));
+            string xpath = "//*[@class=\"navbar-auth-login\"]";
+            var b = (Driver.FindElement(By.XPath(xpath)));
             Driver.ClickElement(b);
             Driver.CheckSiteLoaded("Manager-HeaderSubmenuLogo", 30);
         }
-
-        public Cookie GetCookie()
-        {
-            Cookie cookie = null;
-            try
-            {
-                StreamReader reader = new StreamReader("../../cookie.txt");
-                String name = reader.ReadLine();
-                String value = reader.ReadLine();
-                reader.Close();
-                //expires = Wed 07 / 14 / 2021 13:19:53 UTC; path =/; domain =.raklet.net; secure; httpOnly
-                DateTime time = new DateTime(2021, 07, 14, 13, 19, 53);
-                cookie = new Cookie(name.Trim(), value.Trim(), ".raklet.net", "/", time);                
-            }
-            catch
-            {
-                Assert.Fail("Cannot find the file");
-
-            }
-            return cookie; 
-        }
-
     }
 }

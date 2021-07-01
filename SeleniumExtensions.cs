@@ -79,6 +79,7 @@ namespace RakletTest
             {
                 string xpath = "//*[@class=\"modal-body\"]//a";
                 var e = driver.FindElement(By.XPath(xpath));
+                if (e.Text.Length < 1) return;
                 WebDriverWait w = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
                 w.Until(ExpectedConditions.ElementToBeClickable(e));
                 e.Click();
