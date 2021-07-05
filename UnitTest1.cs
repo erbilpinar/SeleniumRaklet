@@ -21,19 +21,17 @@ namespace RakletTest
         public const string HomePage = "https://hello.raklet.net/";
         public string LoginEmail = "perbil18@ku.edu.tr";
         public string LoginPassword = "rakletdemo123";
+        public string DemoEmail = "test-email";
 
         public static IWebDriver Driver;
-        public List<string> ErrorLogs;
+        public List<string> ErrorLogs = new List<string>();
 
         [TestInitialize]
         public void Initiliaze()
         {
-            ErrorLogs = new List<string>();
-            //Driver = new ChromeDriver();
             ChromeOptions options = new ChromeOptions();
-            options.AddExcludedArgument("disable-popup-blocking");
             var chromeOptions = new ChromeOptions();
-            chromeOptions.AddArguments(new List<string>() { "--headless", "--disable-gpu", "--window-size=1920,1200" });
+            //chromeOptions.AddArguments(new List<string>() { "--headless", "--disable-gpu", "--window-size=1920,1200" });
             var chromeDriverService = ChromeDriverService.CreateDefaultService();
             Driver = new ChromeDriver(chromeDriverService, chromeOptions);
         }
@@ -732,5 +730,222 @@ namespace RakletTest
             Driver.ClickElement(b);
             Driver.CheckSiteLoaded("Manager-HeaderSubmenuLogo", 30);
         }
+    
+        [TestMethod]
+        public void TestEmailSubmitFeatures()
+        {
+            //contact database and paid newsletter are empty
+            List<int> empty = new List<int>() { 1, 11 };
+
+            string xpath = "//*[@id=\"Features-app-store\"]//div/div[";
+            for(int i = 1; i <= 12; i++)
+            {
+                if (empty.Contains(i)) continue;
+
+                Driver.GoToUrl(HomePage + "features/app-store/", "Features-article");
+                
+                var e = Driver.FindElement(By.XPath(xpath + i + "]//a"));
+                string str = e.Text;
+                Driver.ClickElement(e); 
+                Driver.CheckSiteLoaded("lead");
+
+                string buttonXpath = "//form//button";
+                string formXpath = "//form//input";
+                IWebElement email = (Driver.FindElement(By.XPath(formXpath)));
+                email.Clear();
+                email.SendKeys(DemoEmail);
+                Driver.FindElement(By.XPath(buttonXpath)).Click();
+                //Driver.CheckSiteLoaded("Signup");
+                var temp = (Driver.CheckSiteLoaded("Login-content", 5, false));
+                if (temp == null)
+                {
+                    ErrorLogs.Add("Email Submit not sucessfull for " + str);
+                }
+            }
+        }
+
+        [TestMethod]
+        public void TestEmailSubmitReferences()
+        {
+            //creators and publishers are empty
+            List<int> empty = new List<int>() { 1, 2 };
+
+            string xpath = "//*[@class=\"Customers-verticals\"]//div/div[";
+            for (int i = 3; i <= 17; i++)
+            {
+                //if (empty.Contains(i)) continue;
+
+                Driver.GoToUrl(HomePage + "customers", "Customers-verticals");
+
+                var e = Driver.FindElement(By.XPath(xpath + i + "]//a"));
+                string str = e.Text;
+                Driver.ClickElement(e);
+                Driver.CheckSiteLoaded("input-group");
+
+                string buttonXpath = "//form/div//button";
+                string formXpath = "//form/div//input";
+                IWebElement email = (Driver.FindElement(By.XPath(formXpath)));
+                email.Clear();
+                email.SendKeys(DemoEmail);
+                Driver.FindElement(By.XPath(buttonXpath)).Click();
+                //Driver.CheckSiteLoaded("Signup");
+                var temp = (Driver.CheckSiteLoaded("Login-content", 5, false));
+                if(temp == null)
+                {
+                    ErrorLogs.Add("Email Submit not sucessfull for " + str);
+                }
+            }
+        }
+
+        [TestMethod]
+        public void TestEmailSubmitResources()
+        {            
+            Driver.GoToUrl(HomePage + "knowledge-center/", "LandingSection");
+
+            string buttonXpath = "//form/div[1]/div/div//button";
+            string formXpath = "//form/div[1]/div/div/input";
+            IWebElement email = (Driver.FindElement(By.XPath(formXpath)));
+            email.Clear();
+            email.SendKeys(DemoEmail);
+            Driver.FindElement(By.XPath(buttonXpath)).Click();
+            //Driver.CheckSiteLoaded("Signup");
+            var temp = (Driver.CheckSiteLoaded("Login-content", 5, false));
+            if (temp == null)
+            {
+                ErrorLogs.Add("Email Submit not sucessfull for newsletter");
+            }
+        }
+    
+        [TestMethod]
+        public void TestPopUpCaseStudies()
+        {
+            for(int i = 1; i <= 7; i++)
+            {
+                Driver.GoToUrl(HomePage + "knowledge-center/", "LandingSection");
+                string originalWindow = Driver.CurrentWindowHandle;
+                string xpath = "//*[@class=\"list-unstyled\"]//*[@class=\"my-2\"]//a";
+                xpath = "//*[@class=\"list-unstyled\"]//*[@class=\"my-2\"][";
+
+                //IReadOnlyList<
+                IWebElement stories = Driver.FindElement(By.XPath(xpath + i + "]//a"));
+                IWebElement story = stories;
+
+                try
+                {
+                    Driver.ClickElement(story);
+                    WebDriverWait w = new WebDriverWait(Driver, TimeSpan.FromSeconds(40));
+                    xpath = "//*[@id=\"PopupSignupForm_0\"]/div[2]/div[2]";
+                    //w.Until(ExpectedConditions.ElementExists(By.ClassName("mc-modal")));
+                    w.Until(ExpectedConditions.ElementExists(By.XPath(xpath)));
+                }
+                catch (OpenQA.Selenium.WebDriverTimeoutException)
+                {
+                    ErrorLogs.Add("TimeoutException - Popup did not appear for:" + story.Text);
+                }
+                finally
+                {
+                    if (Driver.WindowHandles.Count > 1)
+                    {
+                        Driver.SwitchTo().Window(Driver.WindowHandles[1]);
+                        Driver.Close();
+                        Driver.SwitchTo().Window(originalWindow);
+                    }
+                }
+            }
+        }
+    
+       [TestMethod]
+        public void TestWelcomeMatFeatures()
+        {
+            string className = "landing-closingTitle";
+            //contact database and paid newsletter are empty
+            List<int> empty = new List<int>() { 1, 11 };
+
+            string xpath = "//*[@id=\"Features-app-store\"]//div/div[";
+            for (int i = 1; i <= 12; i++)
+            {
+                if (empty.Contains(i)) continue;
+
+                Driver.GoToUrl(HomePage + "features/app-store/", "Features-article");
+
+                var e = Driver.FindElement(By.XPath(xpath + i + "]//a"));
+                string str = e.Text;
+                Driver.ClickElement(e); 
+                Driver.CheckSiteLoaded("lead");
+                try
+                {
+                    WebDriverWait w = new WebDriverWait(Driver, TimeSpan.FromSeconds(40));
+                    w.Until(ExpectedConditions.ElementExists(By.ClassName(className)));
+                    //email-submit
+                    string buttonXpath = "//body/div[1]//form//button";
+                    string formXpath = "//body/div[1]//form//input";
+                    IWebElement email = (Driver.FindElement(By.XPath(formXpath)));
+                    email.Clear();
+                    email.SendKeys(DemoEmail);
+                    Driver.FindElement(By.XPath(buttonXpath)).Click();
+                    //Driver.CheckSiteLoaded("Signup");
+                    var temp = (Driver.CheckSiteLoaded("Login-content", 5, false));
+                    if (temp == null)
+                    {
+                        ErrorLogs.Add("Email Submit not sucessfull for " + str);
+                    }
+                }
+                catch (OpenQA.Selenium.WebDriverTimeoutException)
+                {
+                    ErrorLogs.Add("TimeoutException - WelcomeMat did not appear for:" + str);
+                }
+                Driver.Quit();
+                Initiliaze();
+            }
+        }
+
+        [TestMethod]
+        public void TestWelcomeMatReferences()
+        {
+            string className = "landing-closingTitle";
+            //creators and publishers are empty
+            List<int> empty = new List<int>() { 1, 2 };
+
+            string xpath = "//*[@class=\"Customers-verticals\"]//div/div[";
+            for (int i = 3; i <= 17; i++)
+            {
+                //if (empty.Contains(i)) continue;
+
+                Driver.GoToUrl(HomePage + "customers", "Customers-verticals");
+
+                var e = Driver.FindElement(By.XPath(xpath + i + "]//a"));
+                string str = e.Text;
+                Driver.ClickElement(e);
+                Driver.CheckSiteLoaded("input-group");
+                try
+                {
+                    WebDriverWait w = new WebDriverWait(Driver, TimeSpan.FromSeconds(40));
+                    w.Until(ExpectedConditions.ElementExists(By.ClassName(className)));
+                    //email-submit
+                    string buttonXpath = "//body/div[1]//form//button";
+                    string formXpath = "//body/div[1]//form//input";
+                    IWebElement email = (Driver.FindElement(By.XPath(formXpath)));
+                    email.Clear();
+                    email.SendKeys(DemoEmail);
+                    Driver.FindElement(By.XPath(buttonXpath)).Click();
+                    //Driver.CheckSiteLoaded("Signup");
+                    var temp = (Driver.CheckSiteLoaded("Login-content", 5, false));
+                    Console.WriteLine(temp);
+                    if (temp == null)
+                    {
+                        ErrorLogs.Add("Email Submit not sucessfull for " + str);
+                    }
+                }
+                catch (OpenQA.Selenium.WebDriverTimeoutException)
+                {
+                    ErrorLogs.Add("TimeoutException - WelcomeMat did not appear for:" + str);
+                }
+                Driver.Quit();
+                Initiliaze();
+                //break;
+            }
+
+        }
+
     }
 }

@@ -25,7 +25,7 @@ namespace RakletTest
             {
                 Assert.Fail("NoSuchElementException");
             }
-            catch (TimeoutException)
+            catch (OpenQA.Selenium.WebDriverTimeoutException)
             {
                 Assert.Fail("TimeoutException");
             }
@@ -45,7 +45,7 @@ namespace RakletTest
             {
                 Assert.Fail("NoSuchElementException");
             }
-            catch (TimeoutException)
+            catch (OpenQA.Selenium.WebDriverTimeoutException)
             {
                 Assert.Fail("TimeoutException");
             }
@@ -66,7 +66,7 @@ namespace RakletTest
             {
                 Assert.Fail("NoSuchElementException");
             }
-            catch (TimeoutException)
+            catch (OpenQA.Selenium.WebDriverTimeoutException)
             {
                 Assert.Fail("TimeoutException");
             }
@@ -94,7 +94,7 @@ namespace RakletTest
             }
         }
 
-        public static IWebElement CheckSiteLoaded(this IWebDriver driver, string verifyClass, int time = 10)
+        public static IWebElement CheckSiteLoaded(this IWebDriver driver, string verifyClass, int time = 10, bool timeOut = true)
         {
             IWebElement element = null;
             try
@@ -105,11 +105,25 @@ namespace RakletTest
             }
             catch (NoSuchElementException)
             {
-                Assert.Fail("NoSuchElementException");
+                if (timeOut)
+                {
+                    Assert.Fail("NoSuchElementException");
+                }
+                else
+                {
+                    return element;
+                }
             }
-            catch (TimeoutException)
+            catch (OpenQA.Selenium.WebDriverTimeoutException)
             {
-                Assert.Fail("TimeoutException");
+                if (timeOut)
+                {
+                    Assert.Fail("TimeoutException - Site is not loaded");
+                }
+                else
+                {
+                    return element;
+                }
             }
             return element;
 
