@@ -118,7 +118,7 @@ namespace RakletTest
             {
                 if (timeOut)
                 {
-                    Assert.Fail("TimeoutException - Site is not loaded");
+                    Assert.Fail("TimeoutException - Site is not loaded - element not found: " + verifyClass);
                 }
                 else
                 {
@@ -126,8 +126,21 @@ namespace RakletTest
                 }
             }
             return element;
-
         }
 
+        public static IWebElement CheckElementExist(this IWebDriver driver, By by)
+        {
+            IWebElement element = null;
+            try
+            {
+                 element = driver.FindElement(by);
+
+            }
+            catch (NoSuchElementException)
+            {
+                Assert.Fail("Element not loaded");
+            }
+            return element;
+        }
     }
 }

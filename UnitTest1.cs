@@ -971,5 +971,99 @@ namespace RakletTest
                 i++;
             }
         }
+    
+    
+        [TestMethod]
+        public void TestHeaderFooter()
+        {
+            List<string> urls = new List<string>()
+            {
+                HomePage, HomePage + "features/app-store/",
+                HomePage + "customers/", HomePage + "pricing",
+                HomePage + "knowledge-center/"
+            };
+            List<string> loaded = new List<string>()
+            {
+                "SectionHero", "Features-article",
+                "Customers-verticals", "Pricing-content",
+                "LandingSection"
+            };
+            int i = 0;
+            foreach (string url in urls)
+            {
+                Driver.GoToUrl(url, loaded[i]);
+                i++;
+
+                IWebElement footer = Driver.CheckSiteLoaded("Footer-content");
+                checkFooter(url);
+            }
+        }
+
+        public void checkFooter(string url)
+        {
+            //First Coloumn
+            Driver.CheckElementExist(By.XPath("//*[@class=\"Footer-content\"]//*[@class=\"col-sm-4\"]"));
+            
+            IWebElement img =  Driver.CheckElementExist(By.XPath("//*[@class=\"Footer-content\"]//*[@class=\"col-sm-4\"]/div/a[1]/img"));
+            CheckEqual(img.GetAttribute("src"), "https://hello.raklet.net/images/_shared/logo/color/white/128.png", "Image not loaded in footer - " + url);
+            
+            IWebElement p = Driver.CheckElementExist(By.XPath("//*[@class=\"Footer-content\"]//*[@class=\"col-sm-4\"]/div/p"));
+            CheckEqual(p.Text, "Raklet is a modern cloud platform that provides plug and play solutions for contacts, messsages and payments.", "Text not correct in footer - " + url);
+            
+            //*[@class="Footer-content"]//*[@class="col-sm-4"]/div/address
+            IWebElement address = Driver.CheckElementExist(By.XPath("//*[@class=\"Footer-content\"]//*[@class=\"col-sm-4\"]/ div/address"));
+            CheckEqual(address.Text, "4347 20th Street, San Francisco CA 94114", "Adress not correct in footer - " + url);
+
+            //*[@class="Footer-content"]//*[@class="col-sm-4"]/div/a[2]
+            IWebElement phone = Driver.CheckElementExist(By.XPath("//*[@class=\"Footer-content\"]//*[@class=\"col-sm-4\"]/div/a[2]"));
+            CheckEqual(phone.Text, "+1.415.234.0554", "Phone number not correct in footer - " + url);
+
+            //*[@class="Footer-content"]//*[@class="col-sm-4"]/div/a[3]
+            IWebElement mail = Driver.CheckElementExist(By.XPath("//*[@class=\"Footer-content\"]//*[@class=\"col-sm-4\"]/ div/a[3]"));
+            CheckEqual(mail.Text, "hello@raklet.com", "Mail not correct in footer - " + url);
+
+            //*[@class="Footer-content"]//*[@class="col-sm-4"]//ul/li[1]/a/img
+            IWebElement andorid = Driver.CheckElementExist(By.XPath("//*[@class=\"Footer-content\"]//*[@class=\"col-sm-4\"]//ul/li[1]/a/img"));
+            CheckEqual(andorid.GetAttribute("src"), "https://hello.raklet.net/images/_shared/android.png", "Andorid logo not loaded in footer - " + url);
+
+            //*[@class="Footer-content"]//*[@class="col-sm-4"]//ul/li[2]/a/img
+            IWebElement ios = Driver.CheckElementExist(By.XPath("//*[@class=\"Footer-content\"]//*[@class=\"col-sm-4\"]//ul/li[2]/a/img"));
+            CheckEqual(ios.GetAttribute("src"), "https://hello.raklet.net/images/_shared/ios.png", "IOS logo not loaded in footer - " + url);
+
+            //*[@class="Footer-content"]//*[@class="col-sm-4"]//ul/li[1]/a/div
+            IWebElement facebook = Driver.CheckElementExist(By.XPath("//*[@class=\"Footer-content\"]//*[@class=\"col-sm-4\"]//ul/li[1]/a/div"));
+
+            //*[@class="Footer-content"]//*[@class="col-sm-4"]//ul/li[2]/a/div
+            IWebElement twitter = Driver.CheckElementExist(By.XPath("//*[@class=\"Footer-content\"]//*[@class=\"col-sm-4\"]//ul/li[2]/a/div"));
+
+            //*[@class="Footer-content"]//*[@class="col-sm-4"]//ul/li[3]/a/div
+            IWebElement instagram = Driver.CheckElementExist(By.XPath("//*[@class=\"Footer-content\"]//*[@class=\"col-sm-4\"]//ul/li[3]/a/div"));
+
+            //*[@class="Footer-language"]//span
+            IWebElement language = Driver.CheckElementExist(By.XPath("//*[@class=\"Footer-language\"]//span"));
+            CheckEqual(language.Text, "Language:", "Language text not correct in footer - " + url);
+
+            //*[@class="Footer-language"]//translation-selector/div/div
+            //translation-selector/div/div/ul/li/a
+            List<string> languages = new List<string>()
+            {
+                "Deutsche", "English", "Española", "Français", "Italiano",
+                "Slovenščina", "Türkçe", "Português", "Polskie", "Svenska", "Nederlands",
+                "Norsk", "български", "čeština", "Eestlane", "Ελληνικά", "हिन्दी",
+                "Gaeilge", "日本人", "Latvietis", "Lietuvis", "Lëtzebuergesch",
+                "മലയാളം", "Română", "Slovenský", "Suomalainen", "dansk",
+                "عربى", "中文", "русский"
+            };
+            Driver.CheckElementExist(By.XPath("//translation-selector/div/div/ul"));
+            /*
+             IList<IWebElement> list = Driver.FindElements(By.XPath("//translation-selector/div/div/ul/li"));
+            Console.WriteLine(list.Count);
+            for (int i = 0; i < 30; i++)
+            {
+                Console.WriteLine(list[i]);
+                CheckEqual(list[i].Text, languages[i], "Dropdown language list is not correct in footer - " + url);
+            }
+            */
+        }
     }
 }
