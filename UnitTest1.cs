@@ -835,8 +835,9 @@ namespace RakletTest
                     Driver.ClickElement(story);
                     WebDriverWait w = new WebDriverWait(Driver, TimeSpan.FromSeconds(40));
                     xpath = "//*[@id=\"PopupSignupForm_0\"]/div[2]/div[2]";
-                    //w.Until(ExpectedConditions.ElementExists(By.ClassName("mc-modal")));
-                    w.Until(ExpectedConditions.ElementExists(By.XPath(xpath)));
+                    w.Until(ExpectedConditions.ElementExists(By.ClassName("mc-modal")));
+                    //w.Until(ExpectedConditions.ElementExists(By.XPath(xpath)));
+
                 }
                 catch (OpenQA.Selenium.WebDriverTimeoutException)
                 {
@@ -947,5 +948,28 @@ namespace RakletTest
 
         }
 
+        [TestMethod]
+        public void TestUtmParameters()
+        {
+            string utm = "?utm_source=Source&utm_medium=Medium&utm_campaign=Campaign&utm_term=Term&utm_content=Content";
+            List<string> urls = new List<string>()
+            {
+                HomePage, HomePage + "features/app-store/",
+                HomePage + "customers/", HomePage + "pricing",
+                HomePage + "knowledge-center/"
+            };
+            List<string> loaded = new List<string>()
+            {
+                "SectionHero", "Features-article",
+                "Customers-verticals", "Pricing-content",
+                "LandingSection"
+            };
+            int i = 0;
+            foreach (string url in urls)
+            {
+                Driver.GoToUrl(url + utm, loaded[i]);
+                i++;
+            }
+        }
     }
 }
