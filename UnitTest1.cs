@@ -31,7 +31,7 @@ namespace RakletTest
         {
             ChromeOptions options = new ChromeOptions();
             var chromeOptions = new ChromeOptions();
-            //chromeOptions.AddArguments(new List<string>() { "--headless", "--disable-gpu", "--window-size=1920,1200" });
+            chromeOptions.AddArguments(new List<string>() { "--headless", "--disable-gpu", "--window-size=1920,1200" });
             var chromeDriverService = ChromeDriverService.CreateDefaultService();
             Driver = new ChromeDriver(chromeDriverService, chromeOptions);
         }
@@ -995,8 +995,32 @@ namespace RakletTest
                 i++;
 
                 IWebElement footer = Driver.CheckSiteLoaded("Footer-content");
+                checkHeader(url);
                 checkFooter(url);
             }
+        }
+
+        public void checkHeader(string url)
+        {
+            Driver.CheckElementExist(By.XPath("//*[@class=\"container-fluid\"]"));
+            //*[@class="container-fluid"]//img
+            IWebElement logo = Driver.CheckElementExist(By.XPath("//*[@class=\"container-fluid\"]//img"));
+            CheckEqual(logo.GetAttribute("src"), "https://hello.raklet.net/images/_shared/logo/color/black/128_.png", "Logo not loaded correctly - " + url);
+            Console.WriteLine(logo.GetAttribute("src"));
+            //*[@class="container-fluid"]//li[1]/a
+            IWebElement features = Driver.CheckElementExist(By.XPath("//*[@class=\"container-fluid\"]//li[1]/a"));
+            CheckEqual(features.GetAttribute("href"), "https://hello.raklet.net/features/app-store/", "Features not loaded correctly - " + url);
+            Console.WriteLine(features.GetAttribute("href"));
+            IWebElement references = Driver.CheckElementExist(By.XPath("//*[@class=\"container-fluid\"]//li[2]/a"));
+            CheckEqual(references.GetAttribute("href"), "https://hello.raklet.net/customers", "References not loaded correctly - " + url);
+            Console.WriteLine(references.GetAttribute("href"));
+            IWebElement pricing = Driver.CheckElementExist(By.XPath("//*[@class=\"container-fluid\"]//li[3]/a"));
+            CheckEqual(pricing.GetAttribute("href"), "https://hello.raklet.net/pricing/", "Pricing not loaded correctly - " + url);
+            Console.WriteLine(pricing.GetAttribute("href"));
+            IWebElement resources = Driver.CheckElementExist(By.XPath("//*[@class=\"container-fluid\"]//li[4]/a"));
+            CheckEqual(resources.GetAttribute("href"), "https://hello.raklet.net/knowledge-center/", "Resources not loaded correctly - " + url);
+            Console.WriteLine(resources.GetAttribute("href"));
+
         }
 
         public void checkFooter(string url)
@@ -1054,16 +1078,113 @@ namespace RakletTest
                 "മലയാളം", "Română", "Slovenský", "Suomalainen", "dansk",
                 "عربى", "中文", "русский"
             };
-            Driver.CheckElementExist(By.XPath("//translation-selector/div/div/ul"));
-            /*
-             IList<IWebElement> list = Driver.FindElements(By.XPath("//translation-selector/div/div/ul/li"));
-            Console.WriteLine(list.Count);
-            for (int i = 0; i < 30; i++)
+            IWebElement dropdown = Driver.CheckElementExist(By.XPath("//translation-selector//ul"));
+
+            IWebElement e =  Driver.CheckElementExist(By.XPath("//translation-selector//*[@class=\"dropdown-toggle\"]"));
+            CheckEqual(e.Text, "English", "Footer language not correct- " + url);
+            Driver.ClickElement(e);
+
+            for(int i = 0; i < languages.Count; i++)
             {
-                Console.WriteLine(list[i]);
-                CheckEqual(list[i].Text, languages[i], "Dropdown language list is not correct in footer - " + url);
+                IWebElement ee = Driver.FindElement(By.XPath("//translation-selector//li[" + (i+1) + "]/a"));
+                CheckEqual(ee.Text, languages[i], "Footer languages dropdown list not correct - " + url);
             }
-            */
+
+            //Second Coloumn
+            Driver.CheckElementExist(By.XPath("//footer/div[1]//div[2]"));
+            List<string> col2Names = new List<string>()
+            {
+                "Features", 
+                "References", 
+                "Pricing", 
+                "Resources",
+                "Help Center", 
+                "Blog", 
+                "About", 
+                "Explore",
+                "Countries we serve", 
+                "We're hiring!",
+                "API & Developers", 
+                "Affiliate Program",
+                "Contact", 
+                "Schedule Demo"
+            };
+            List<string> col2Href = new List<string>()
+            {
+                "https://hello.raklet.net/features/app-store/",
+                "https://hello.raklet.net/customers/",
+                "https://hello.raklet.net/pricing/",
+                "https://hello.raklet.net/knowledge-center/",
+                "https://help.raklet.com/",
+                "https://blog.raklet.com/",
+                "https://hello.raklet.net/our-story/",
+                "https://hello.raklet.net/explore/",
+                "https://hello.raklet.net/countries-we-serve/",
+                "https://angel.co/raklet/jobs",
+                "https://api.raklet.com/swagger/ui/index/",
+                "https://hello.raklet.net/affiliate/",
+                "https://hello.raklet.net/contact/",
+                "https://hello.raklet.net/schedule-demo/"
+            };
+            for (int i = 1; i <= 14; i++)
+            {
+                IWebElement element = Driver.CheckElementExist(By.XPath("//footer/div[1]//div[2]//*[@class=\"list-unstyled\"]/li[" + i + "]/a"));
+                CheckEqual(col2Names[i - 1], element.Text, "Footer not loaded correctly - " + url);
+                CheckEqual(col2Href[i - 1], element.GetAttribute("href"), "Footer link not correct for " + element.Text + " - " + url);
+            }
+
+            //Third Coloumn
+            Driver.CheckElementExist(By.XPath("//footer/div[1]//div[3]"));
+            List<string> col3Names = new List<string>()
+            {
+                "Membership Management Software",
+                "Event Management Software",
+                "Club Management Software",
+                "Alumni Engagement Platform",
+                "Digital Membership Card",
+                "Non-Profit Fundraising Software",
+                "Association Management Software",
+                "Chamber of Commerce Software",
+                "Church Software",
+                "Political Party Software",
+                "Comparison of Raklet with other platforms",
+                "Integrations",
+                "Reviews"
+            };
+            List<string> col3Href = new List<string>()
+            {
+                "https://hello.raklet.net/membership-management-software/",
+                "https://hello.raklet.net/event-management-software/",
+                "https://hello.raklet.net/club-management-software/",
+                "https://hello.raklet.net/alumni-engagement-software/",
+                "https://hello.raklet.net/digital-membership-card/",
+                "https://hello.raklet.net/non-profit-software/",
+                "https://hello.raklet.net/association-management-software/",
+                "https://hello.raklet.net/chamber-of-commerce-software/",
+                "https://hello.raklet.net/church-software/",
+                "https://hello.raklet.net/political-party-software/",
+                "https://hello.raklet.net/alternative/all-platforms/",
+                "https://hello.raklet.net/integrations/",
+                "https://hello.raklet.net/reviews/"
+            };
+            for (int i = 1; i <= 13; i++)
+            {
+                IWebElement element = Driver.CheckElementExist(By.XPath("//footer/div[1]//div[3]//*[@class=\"list-unstyled\"]/li[" + i + "]/a"));
+                CheckEqual(col3Names[i - 1], element.Text, "Footer not loaded correctly - " + url);
+                CheckEqual(col3Href[i - 1], element.GetAttribute("href"), "Footer link not correct for " + element.Text + " - " + url);
+            }
+
+            //Extra footer
+            IWebElement a =  Driver.CheckElementExist(By.XPath("//*[@class=\"Footer-extras\"]//*[@class=\"alpha\"]"));
+            CheckEqual(a.Text, "Made with love", "Extra footer not loaded correctly - " + url);
+
+            IWebElement o = Driver.CheckElementExist(By.XPath("//*[@class=\"Footer-extras\"]//*[@class=\"omega\"]"));
+            CheckEqual(o.Text, "in San Francisco, Berlin & Istanbul", "Extra footer not loaded correctly - " + url);
+            
+            IWebElement t = Driver.CheckElementExist(By.XPath("//*[@class=\"Footer-extras\"]//*[@class=\"Footer-extrasNav list-inline\"]"));
+            CheckEqual(t.Text, "Terms of UsePrivacy Policy©2013-2021", "Extra footer not loaded correctly - " + url);
+
         }
+    
     }
 }
