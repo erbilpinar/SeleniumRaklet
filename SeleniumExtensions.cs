@@ -57,7 +57,7 @@ namespace RakletTest
             IWebElement body = null;
             try
             {
-                driver.Navigate().GoToUrl(@url);
+                driver.Navigate().GoToUrl(url);
                 WebDriverWait w = new WebDriverWait(driver, TimeSpan.FromSeconds(20));
                 w.Until(ExpectedConditions.ElementExists(By.ClassName(className)));
                 body = driver.FindElement(By.ClassName(className));
