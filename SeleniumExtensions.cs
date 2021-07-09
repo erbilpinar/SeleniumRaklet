@@ -128,13 +128,40 @@ namespace RakletTest
             return element;
         }
 
-        public static IWebElement CheckElementExist(this IWebDriver driver, By by)
+        public static IWebElement CheckElementExist(this IWebDriver driver, By by, IWebElement body = null)
         {
             IWebElement element = null;
             try
             {
-                 element = driver.FindElement(by);
+                if (body == null)
+                {
+                    element = driver.FindElement(by);
+                }
+                else
+                {
+                    element = body.FindElement(by);
+                }
+            }
+            catch (NoSuchElementException)
+            {
+                Assert.Fail("Element not loaded");
+            }
+            return element;
+        }
 
+        public static IList<IWebElement> CheckElementsExist(this IWebDriver driver, By by, IWebElement body = null)
+        {
+            IList<IWebElement> element = null;
+            try
+            {
+                if (body == null)
+                {
+                    element = driver.FindElements(by);
+                }
+                else
+                {
+                    element = body.FindElements(by);
+                }
             }
             catch (NoSuchElementException)
             {
