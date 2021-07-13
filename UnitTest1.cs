@@ -10,6 +10,7 @@ using OpenQA.Selenium;
 using OpenQA.Selenium.Chrome;
 using OpenQA.Selenium.Support.UI;
 using System.IO;
+using OpenQA.Selenium.Interactions;
 
 namespace RakletTest
 {
@@ -19,7 +20,7 @@ namespace RakletTest
         public const string HomePage = "https://hello.raklet.net/";
         public string LoginEmail = "perbil18@ku.edu.tr";
         public string LoginPassword = "rakletdemo123";
-        public string DemoEmail = "test-email";
+        public string DemoEmail = "pnar.erbl" + DateTime.Now.Millisecond + "@gmail.com";
 
         public static IWebDriver Driver;
         public List<string> ErrorLogs = new List<string>();
@@ -29,7 +30,7 @@ namespace RakletTest
         {
             ChromeOptions options = new ChromeOptions();
             var chromeOptions = new ChromeOptions();
-            chromeOptions.AddArguments(new List<string>() { "--headless", "--disable-gpu", "--window-size=1920,1200" });
+            //chromeOptions.AddArguments(new List<string>() { "--incognito", "--headless", "--disable-gpu", "--window-size=1920,1200" });
             var chromeDriverService = ChromeDriverService.CreateDefaultService();
             Driver = new ChromeDriver(chromeDriverService, chromeOptions);
         }
@@ -37,7 +38,7 @@ namespace RakletTest
         [TestCleanup]
         public void CleanUp()
         {
-            Driver.Quit();
+            //Driver.Quit();
             CheckForErrors();
         }
 
@@ -60,7 +61,6 @@ namespace RakletTest
         {
             IWebElement body = Driver.GoToUrl(HomePage, "SectionHero");
             IList<IWebElement> href = Driver.CheckElementsExist(By.TagName("a"), body);
-
             for (int i = 0; i < href.Count; i++)
             {
                 body = Driver.CheckSiteLoaded("SectionHero");
@@ -71,27 +71,6 @@ namespace RakletTest
                 {
                     ErrorLogs.Add("link is empty: " + href[i].Text);
                 }
-                /*body = Driver.GoToUrl(HomePage, "SectionHero");
-                href = body.FindElements(By.TagName("a"));
-                string link = href[i].Text;
-                Driver.ClickElement(href[i]);
-                if (Driver.WindowHandles.Count > 1)
-                {
-                    Driver.SwitchTo().Window(Driver.WindowHandles[1]);
-                    Driver.Close();
-                    Driver.SwitchTo().Window(originalWindow);
-                }
-                else
-                {
-                    if (Driver.Url == HomePage)
-                    {
-                        ErrorLogs.Add("Empty link:" + link);
-                    }
-                    else
-                    {
-                        Driver.Navigate().Back();
-                    }
-                }*/
             }
         }
 
@@ -130,7 +109,6 @@ namespace RakletTest
         public void TestLinks(IWebElement body, string verifyClass)
         {
             IList<IWebElement> href = Driver.CheckElementsExist(By.TagName("a"), body);
-            //string originalWindow = Driver.CurrentWindowHandle;
 
             for (int i = 0; i < href.Count; i++)
             {
@@ -142,27 +120,6 @@ namespace RakletTest
                 {
                     ErrorLogs.Add("link is empty: " + href[i].Text);
                 }
-                /*string link = href[i].Text;
-                Driver.ClickElement(href[i]);
-                if (Driver.WindowHandles.Count > 1)
-                {
-                    Driver.SwitchTo().Window(Driver.WindowHandles[1]);
-                    Driver.Close();
-                    Driver.SwitchTo().Window(originalWindow);
-                }
-                else
-                {
-                    if (Driver.Url == HomePage)
-                    {
-                        ErrorLogs.Add("Main link:" + link);
-                    }
-                    Driver.Navigate().Back();
-                    if (Driver.Url == HomePage)
-                    {
-                        ErrorLogs.Add("Empty link:" + link);
-                        Driver.Navigate().Forward();
-                    }
-                }*/
             }
         }
 
@@ -320,7 +277,6 @@ namespace RakletTest
                 option.Price = values[0].Replace(",", "").Replace(".00", "");
                 option.Contacts = Convert.ToInt32(values[1].Replace(",", ""));
                 option.CustomFields = Convert.ToInt32(values[2]);
-
                 //remove the gb from the storage
                 string var = values[3].Substring(0, values[3].Length - 3);
                 option.Storage = var;
@@ -730,26 +686,27 @@ namespace RakletTest
             List<int> empty = new List<int>() { 1, 11 };
 
             string xpath = "//*[@id=\"Features-app-store\"]//div/div[";
-            for(int i = 1; i <= 12; i++)
+            string buttonXpath = "//form//button";
+            string formXpath = "//form//input";
+
+            for (int i = 1; i <= 12; i++)
             {
                 if (empty.Contains(i)) continue;
 
                 Driver.GoToUrl(HomePage + "features/app-store/", "Features-article");
-                
                 var e = Driver.CheckElementExist(By.XPath(xpath + i + "]//a"));
                 string str = e.Text;
-                Driver.ClickElement(e); 
-                Driver.CheckSiteLoaded("lead");
 
-                string buttonXpath = "//form//button";
-                string formXpath = "//form//input";
+                Driver.ClickElement(e); 
+                Driver.CheckSiteLoaded("input-group");
+                Console.WriteLine(DemoEmail);
                 IWebElement email = (Driver.CheckElementExist(By.XPath(formXpath)));
                 email.Clear();
                 email.SendKeys(DemoEmail);
                 Driver.CheckElementExist(By.XPath(buttonXpath)).Click();
-                //Driver.CheckSiteLoaded("Signup");
                 var temp = (Driver.CheckSiteLoaded("Login-content", 5, false));
-                if (temp == null)
+                var temp1 = Driver.CheckSiteLoaded("Onboarding-title", 5, false);
+                if (temp == null && temp1 == null)
                 {
                     ErrorLogs.Add("Email Submit not sucessfull for " + str);
                 }
@@ -763,9 +720,12 @@ namespace RakletTest
             List<int> empty = new List<int>() { 1, 2 };
 
             string xpath = "//*[@class=\"Customers-verticals\"]//div/div[";
-            for (int i = 3; i <= 17; i++)
+            string buttonXpath = "//form/div//button";
+            string formXpath = "//form/div//input";
+
+            for (int i = 1; i <= 17; i++)
             {
-                //if (empty.Contains(i)) continue;
+                if (empty.Contains(i)) continue;
 
                 Driver.GoToUrl(HomePage + "customers", "Customers-verticals");
 
@@ -774,15 +734,13 @@ namespace RakletTest
                 Driver.ClickElement(e);
                 Driver.CheckSiteLoaded("input-group");
 
-                string buttonXpath = "//form/div//button";
-                string formXpath = "//form/div//input";
                 IWebElement email = (Driver.CheckElementExist(By.XPath(formXpath)));
                 email.Clear();
                 email.SendKeys(DemoEmail);
                 Driver.CheckElementExist(By.XPath(buttonXpath)).Click();
-                //Driver.CheckSiteLoaded("Signup");
                 var temp = (Driver.CheckSiteLoaded("Login-content", 5, false));
-                if(temp == null)
+                var temp1 = Driver.CheckSiteLoaded("Onboarding-title", 5, false);
+                if (temp == null && temp1 == null)
                 {
                     ErrorLogs.Add("Email Submit not sucessfull for " + str);
                 }
@@ -800,9 +758,10 @@ namespace RakletTest
             email.Clear();
             email.SendKeys(DemoEmail);
             Driver.CheckElementExist(By.XPath(buttonXpath)).Click();
-            //Driver.CheckSiteLoaded("Signup");
+
             var temp = (Driver.CheckSiteLoaded("Login-content", 5, false));
-            if (temp == null)
+            var temp1 = Driver.CheckSiteLoaded("Onboarding-title", 5, false);
+            if (temp == null && temp1 == null)
             {
                 ErrorLogs.Add("Email Submit not sucessfull for resources newsletter");
             }
@@ -811,7 +770,7 @@ namespace RakletTest
         [TestMethod]
         public void TestPopUpCaseStudies()
         {
-            for(int i = 1; i <= 7; i++)
+            for(int i = 1; i <= 1; i++)
             {
                 Driver.GoToUrl(HomePage + "knowledge-center/", "LandingSection");
                 string originalWindow = Driver.CurrentWindowHandle;
@@ -824,15 +783,12 @@ namespace RakletTest
                 try
                 {
                     Driver.ClickElement(story);
-                    WebDriverWait w = new WebDriverWait(Driver, TimeSpan.FromSeconds(40));
                     xpath = "//*[@id=\"PopupSignupForm_0\"]/div[2]/div[2]";
-                    w.Until(ExpectedConditions.ElementExists(By.ClassName("mc-modal")));
-                    //w.Until(ExpectedConditions.ElementExists(By.XPath(xpath)));
-
+                    Driver.Wait(40, "ElementExists", By.XPath(xpath), null);
                 }
-                catch (OpenQA.Selenium.WebDriverTimeoutException)
+                catch (Exception e)
                 {
-                    ErrorLogs.Add("TimeoutException - Popup did not appear for:" + story.Text);
+                    ErrorLogs.Add("TimeoutException - Popup did not appear for:" + story.Text + e.Message + e.StackTrace);
                 }
                 finally
                 {
@@ -854,6 +810,8 @@ namespace RakletTest
             List<int> empty = new List<int>() { 1, 11 };
 
             string xpath = "//*[@id=\"Features-app-store\"]//div/div[";
+            string buttonXpath = "//body/div[1]//form//button";
+            string formXpath = "//body/div[1]//form//input";
             for (int i = 1; i <= 12; i++)
             {
                 if (empty.Contains(i)) continue;
@@ -866,16 +824,12 @@ namespace RakletTest
                 Driver.CheckSiteLoaded("lead");
                 try
                 {
-                    WebDriverWait w = new WebDriverWait(Driver, TimeSpan.FromSeconds(40));
-                    w.Until(ExpectedConditions.ElementExists(By.ClassName(className)));
+                    Driver.Wait(40, "ElementExists", By.ClassName(className), null);
                     //email-submit
-                    string buttonXpath = "//body/div[1]//form//button";
-                    string formXpath = "//body/div[1]//form//input";
                     IWebElement email = (Driver.CheckElementExist(By.XPath(formXpath)));
                     email.Clear();
                     email.SendKeys(DemoEmail);
                     Driver.CheckElementExist(By.XPath(buttonXpath)).Click();
-                    //Driver.CheckSiteLoaded("Signup");
                     var temp = (Driver.CheckSiteLoaded("Login-content", 5, false));
                     if (temp == null)
                     {
@@ -886,8 +840,11 @@ namespace RakletTest
                 {
                     ErrorLogs.Add("TimeoutException - WelcomeMat did not appear for:" + str);
                 }
-                Driver.Quit();
-                Initiliaze();
+                finally
+                {
+                   Driver.Quit();
+                    Initiliaze();
+                }
             }
         }
 
@@ -899,9 +856,11 @@ namespace RakletTest
             List<int> empty = new List<int>() { 1, 2 };
 
             string xpath = "//*[@class=\"Customers-verticals\"]//div/div[";
-            for (int i = 3; i <= 17; i++)
+            string buttonXpath = "//body/div[1]//form//button";
+            string formXpath = "//body/div[1]//form//input";
+            for (int i = 1; i <= 17; i++)
             {
-                //if (empty.Contains(i)) continue;
+                if (empty.Contains(i)) continue;
 
                 Driver.GoToUrl(HomePage + "customers", "Customers-verticals");
 
@@ -911,16 +870,12 @@ namespace RakletTest
                 Driver.CheckSiteLoaded("lead");
                 try
                 {
-                    WebDriverWait w = new WebDriverWait(Driver, TimeSpan.FromSeconds(40));
-                    w.Until(ExpectedConditions.ElementExists(By.ClassName(className)));
+                    Driver.Wait(40, "ElementExists", By.ClassName(className), null);
                     //email-submit
-                    string buttonXpath = "//body/div[1]//form//button";
-                    string formXpath = "//body/div[1]//form//input";
                     IWebElement email = (Driver.CheckElementExist(By.XPath(formXpath)));
                     email.Clear();
                     email.SendKeys(DemoEmail);
                     Driver.CheckElementExist(By.XPath(buttonXpath)).Click();
-                    //Driver.CheckSiteLoaded("Signup");
                     var temp = (Driver.CheckSiteLoaded("Login-content", 5, false));
                     if (temp == null)
                     {
@@ -931,10 +886,12 @@ namespace RakletTest
                 {
                     ErrorLogs.Add("TimeoutException - WelcomeMat did not appear for:" + str);
                 }
-                Driver.Quit();
-                Initiliaze();
+                finally
+                {
+                    Driver.Quit();
+                    Initiliaze();
+                }
             }
-
         }
 
         [TestMethod]

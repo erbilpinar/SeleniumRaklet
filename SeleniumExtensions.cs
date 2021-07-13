@@ -11,23 +11,22 @@ namespace RakletTest
 {
     public static class SeleniumExtensions
     {
-        /*Wait until the linkText appears and click on it */
+        /*Wait until the link/Text appears and click on it */
         public static void ClickText(this IWebDriver driver, string linkText)
         {
             try
             {
-                WebDriverWait w = new WebDriverWait(driver, TimeSpan.FromSeconds(20));
-                w.Until(ExpectedConditions.ElementExists(By.LinkText(linkText)));
-                driver.FindElement(By.LinkText(linkText)).Click();
+                Wait(driver, 20, "ElementExists", By.LinkText(linkText), null);
+                driver.CheckElementExist(By.LinkText(linkText)).Click();
                 CheckForPopup(driver);
             }
-            catch (NoSuchElementException)
+            catch (NoSuchElementException e)
             {
-                Assert.Fail("NoSuchElementException");
+                Assert.Fail("NoSuchElementException" + e.Message + e.StackTrace);
             }
-            catch (OpenQA.Selenium.WebDriverTimeoutException)
+            catch (OpenQA.Selenium.WebDriverTimeoutException e)
             {
-                Assert.Fail("TimeoutException");
+                Assert.Fail("TimeoutException" + e.Message + e.StackTrace);
             }
         }
 
@@ -36,18 +35,17 @@ namespace RakletTest
         {
             try
             {
-                WebDriverWait w = new WebDriverWait(driver, TimeSpan.FromSeconds(20));
-                w.Until(ExpectedConditions.ElementToBeClickable(element));
+                Wait(driver, 20, "ElementToBeClickable", null, element);
                 element.Click();
                 CheckForPopup(driver);
             }
-            catch (NoSuchElementException)
+            catch (NoSuchElementException e)
             {
-                Assert.Fail("NoSuchElementException");
+                Assert.Fail("NoSuchElementException" + e.Message + e.StackTrace);
             }
-            catch (OpenQA.Selenium.WebDriverTimeoutException)
+            catch (OpenQA.Selenium.WebDriverTimeoutException e)
             {
-                Assert.Fail("TimeoutException");
+                Assert.Fail("TimeoutException" + e.Message + e.StackTrace);
             }
         }
 
@@ -58,17 +56,16 @@ namespace RakletTest
             try
             {
                 driver.Navigate().GoToUrl(url);
-                WebDriverWait w = new WebDriverWait(driver, TimeSpan.FromSeconds(20));
-                w.Until(ExpectedConditions.ElementExists(By.ClassName(className)));
-                body = driver.FindElement(By.ClassName(className));
+                Wait(driver, 20, "ElementExists", By.ClassName(className), null);
+                body = driver.CheckElementExist(By.ClassName(className));
             }
-            catch (NoSuchElementException)
+            catch (NoSuchElementException e)
             {
-                Assert.Fail("NoSuchElementException");
+                Assert.Fail("NoSuchElementException" + e.Message + e.StackTrace);
             }
-            catch (OpenQA.Selenium.WebDriverTimeoutException)
+            catch (OpenQA.Selenium.WebDriverTimeoutException e)
             {
-                Assert.Fail("TimeoutException");
+                Assert.Fail("TimeoutException" + e.Message + e.StackTrace);
             }
             return body;
         }
@@ -78,19 +75,18 @@ namespace RakletTest
             try
             {
                 string xpath = "//*[@class=\"modal-body\"]//a";
-                var e = driver.FindElement(By.XPath(xpath));
-                if (e.Text.Length < 1) return;
-                WebDriverWait w = new WebDriverWait(driver, TimeSpan.FromSeconds(10));
-                w.Until(ExpectedConditions.ElementToBeClickable(e));
+                var e = driver.CheckElementExist(By.XPath(xpath), null, true);
+                if (e == null || e.Text.Length < 1) return;
+                Wait(driver, 10, "ElementToBeClickable", null, e);
                 e.Click();
             }
             catch (NoSuchElementException)
             {
                 return;
             }
-            catch (TimeoutException)
+            catch (TimeoutException e)
             {
-                Assert.Fail("TimeoutException");
+                Assert.Fail("TimeoutException" + e.Message + e.StackTrace);
             }
         }
 
@@ -99,26 +95,25 @@ namespace RakletTest
             IWebElement element = null;
             try
             {
-                WebDriverWait w = new WebDriverWait(driver, TimeSpan.FromSeconds(time));
-                w.Until(ExpectedConditions.ElementExists(By.ClassName(verifyClass)));
-                element = driver.FindElement(By.ClassName(verifyClass));
+                Wait(driver, time, "ElementExists", By.ClassName(verifyClass), null);
+                element = driver.CheckElementExist(By.ClassName(verifyClass));
             }
-            catch (NoSuchElementException)
+            catch (NoSuchElementException e)
             {
                 if (timeOut)
                 {
-                    Assert.Fail("NoSuchElementException");
+                    Assert.Fail("NoSuchElementException" + e.Message + e.StackTrace);
                 }
                 else
                 {
                     return element;
                 }
             }
-            catch (OpenQA.Selenium.WebDriverTimeoutException)
+            catch (OpenQA.Selenium.WebDriverTimeoutException e)
             {
                 if (timeOut)
                 {
-                    Assert.Fail("TimeoutException - Site is not loaded - element not found: " + verifyClass);
+                    Assert.Fail("TimeoutException - Site is not loaded - element not found: " + verifyClass + e.Message + e.StackTrace);
                 }
                 else
                 {
@@ -128,7 +123,7 @@ namespace RakletTest
             return element;
         }
 
-        public static IWebElement CheckElementExist(this IWebDriver driver, By by, IWebElement body = null)
+        public static IWebElement CheckElementExist(this IWebDriver driver, By by, IWebElement body = null, bool popup = false)
         {
             IWebElement element = null;
             try
@@ -142,9 +137,10 @@ namespace RakletTest
                     element = body.FindElement(by);
                 }
             }
-            catch (NoSuchElementException)
+            catch (NoSuchElementException e)
             {
-                Assert.Fail("Element not loaded");
+                if (popup) return element;
+                Assert.Fail("Element not loaded" + e.Message + e.StackTrace);
             }
             return element;
         }
@@ -163,11 +159,30 @@ namespace RakletTest
                     element = body.FindElements(by);
                 }
             }
-            catch (NoSuchElementException)
+            catch (NoSuchElementException e)
             {
-                Assert.Fail("Element not loaded");
+                Assert.Fail("Element not loaded" + e.Message + e.StackTrace);
             }
             return element;
+        }
+
+        public static void Wait(this IWebDriver driver, int time, string method, By by, IWebElement element)
+        {
+            try
+            {
+                WebDriverWait w = new WebDriverWait(driver, TimeSpan.FromSeconds(time));
+                if (method.Equals("ElementExists"))
+                {
+                    w.Until(ExpectedConditions.ElementExists(by));
+                }
+                else if (method == "ElementToBeClickable")
+                    w.Until(ExpectedConditions.ElementToBeClickable(element));
+                else Assert.Fail("Wait is not defined");
+            }
+            catch (Exception e)
+            {
+                throw e;
+            }
         }
     }
 }
