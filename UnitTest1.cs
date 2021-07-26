@@ -35,7 +35,7 @@ namespace RakletTest
         [TestCleanup]
         public void CleanUp()
         {
-            Driver.Quit();
+            //Driver.Quit();
             CheckForErrors();
         }
 
@@ -207,9 +207,9 @@ namespace RakletTest
             {
                 Assert.AreEqual(expected, actual);
             }
-            catch (AssertFailedException)
+            catch (AssertFailedException e)
             {
-                ErrorLogs.Add(message);
+                ErrorLogs.Add(message + e.Message + e.StackTrace);
             }
         }
 
@@ -539,9 +539,9 @@ namespace RakletTest
                 DateTime time = new DateTime(2021, 07, 28, 13, 19, 53);
                 cookie = new Cookie(name.Trim(), value.Trim(), ".raklet.net", "/", time);
             }
-            catch
+            catch(Exception e)
             {
-                Assert.Fail("Cannot find the file");
+                Assert.Fail("Cannot find the file" + e.Message + e.StackTrace);
 
             }
             return cookie;
@@ -757,17 +757,15 @@ namespace RakletTest
             {
                 Driver.GoToUrl(HomePage + "knowledge-center/", "LandingSection");
                 string originalWindow = Driver.CurrentWindowHandle;
-                string xpath = "//*[@class=\"list-unstyled\"]//*[@class=\"my-2\"]//a";
-                xpath = "//*[@class=\"list-unstyled\"]//*[@class=\"my-2\"][";
-
-                IWebElement stories = Driver.CheckElementExist(By.XPath(xpath + i + "]//a"));
-                IWebElement story = stories;
+                string xpath = "//*[@class=\"list-unstyled\"]//*[@class=\"my-2\"][";
+                IWebElement story = Driver.CheckElementExist(By.XPath(xpath + i + "]//a"));
 
                 try
                 {
                     Driver.ClickElement(story);
-                    xpath = "//*[@id=\"PopupSignupForm_0\"]/div[2]/div[2]";
-                    Driver.Wait(40, "ElementExists", By.XPath(xpath), null);
+                    string id = "SignupForm_0";
+                    xpath = "//*[@id=\"SignupForm_0\"]";
+                    Driver.Wait(40, "ElementExists", By.ClassName("flash-block"), null);
                 }
                 catch (Exception e)
                 {
@@ -782,6 +780,7 @@ namespace RakletTest
                         Driver.SwitchTo().Window(originalWindow);
                     }
                 }
+                break;
             }
         }
     
@@ -842,9 +841,9 @@ namespace RakletTest
                     ErrorLogs.Add("Email Submit not sucessfull for " + str);
                 }
             }
-            catch (OpenQA.Selenium.WebDriverTimeoutException)
+            catch (OpenQA.Selenium.WebDriverTimeoutException er)
             {
-                ErrorLogs.Add("TimeoutException - WelcomeMat did not appear for:" + str);
+                ErrorLogs.Add("TimeoutException - WelcomeMat did not appear for:" + str + er.Message + er.StackTrace);
             }
             finally
             {
