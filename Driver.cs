@@ -4,11 +4,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
+
 
 namespace RakletTest
 {
-    class Driver
+    public class Driver
     {
         public ChromeOptions ChromeOptions = new ChromeOptions();
         public ChromeDriverService chromeDriverService = ChromeDriverService.CreateDefaultService();
