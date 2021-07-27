@@ -35,7 +35,7 @@ namespace RakletTest
         [TestCleanup]
         public void CleanUp()
         {
-            //Driver.Quit();
+            Driver.Quit();
             CheckForErrors();
         }
 
@@ -780,7 +780,6 @@ namespace RakletTest
                         Driver.SwitchTo().Window(originalWindow);
                     }
                 }
-                break;
             }
         }
     
