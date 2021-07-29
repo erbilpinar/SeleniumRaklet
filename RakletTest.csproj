@@ -59,10 +59,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AccountTests.cs" />
+    <Compile Include="FormSubmitTests.cs" />
+    <Compile Include="HeaderFooterTests.cs" />
     <Compile Include="Driver.cs" />
     <Compile Include="PriceClass.cs" />
     <Compile Include="SeleniumExtensions.cs" />
-    <Compile Include="UnitTest1.cs" />
+    <Compile Include="PageTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
