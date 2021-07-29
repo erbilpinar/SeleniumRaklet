@@ -184,5 +184,34 @@ namespace RakletTest
                 throw e;
             }
         }
+        public static List<string> CheckEqual<T>(this IWebDriver driver, T expected, T actual, string message, List<string> ErrorLogs)
+        {
+            try
+            {
+                Assert.AreEqual(expected, actual);
+            }
+            catch (AssertFailedException e)
+            {
+                ErrorLogs.Add(message + e.Message + e.StackTrace);
+            }    
+             return ErrorLogs;
+        }
+        public static List<string> TestLinks(this IWebDriver driver, IWebElement body, string verifyClass, List<string> ErrorLogs)
+        {
+            IList<IWebElement> href = driver.CheckElementsExist(By.TagName("a"), body);
+
+            for (int i = 0; i < href.Count; i++)
+            {
+                body = driver.CheckSiteLoaded(verifyClass);
+                href = driver.CheckElementsExist(By.TagName("a"), body);
+                string link = href[i].GetProperty("href");
+                string onclick = href[i].GetProperty("onclick");
+                if (link == "#" && onclick == null)
+                {
+                    ErrorLogs.Add("link is empty: " + href[i].Text);
+                }
+            }
+            return ErrorLogs;
+        }
     }
 }
