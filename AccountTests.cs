@@ -14,7 +14,8 @@ using OpenQA.Selenium.Interactions;
 
 namespace RakletTest
 {
-    class AccountTests
+    [TestClass]
+    public class AccountTests
     {
         public const string HomePage = "https://hello.raklet.net/";
         public string LoginEmail = "perbil18@ku.edu.tr";
@@ -59,7 +60,7 @@ namespace RakletTest
             LoginWithCookies();
         }
 
-        public Cookie GetCookie()
+        public Cookie GetCookieFromFile()
         {
             Cookie cookie = null;
             try
@@ -68,8 +69,8 @@ namespace RakletTest
                 String name = reader.ReadLine();
                 String value = reader.ReadLine();
                 reader.Close();
-                //expires = Wed 07 / 14 / 2051 13:19:53 UTC; path =/; domain =.raklet.net; secure; httpOnly
-                DateTime time = new DateTime(2021, 07, 28, 13, 19, 53);
+                //expires = 2021-08-13; path =/; domain =.raklet.net; secure; httpOnly
+                DateTime time = new DateTime(2021, 08, 13, 13, 19, 53);
                 cookie = new Cookie(name.Trim(), value.Trim(), ".raklet.net", "/", time);
             }
             catch (Exception e)
@@ -108,7 +109,7 @@ namespace RakletTest
         public void LoginWithCookies()
         {
             Driver.GoToUrl(HomePage, "SectionHero");
-            Cookie cookie = GetCookie();
+            Cookie cookie = GetCookieFromFile();
             Driver.Manage().Cookies.AddCookie(cookie);
 
             string xpath = "//*[@class=\"navbar-auth-login\"]";

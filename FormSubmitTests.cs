@@ -14,7 +14,8 @@ using OpenQA.Selenium.Interactions;
 
 namespace RakletTest
 {
-    class FormSubmitTests
+    [TestClass]
+    public class FormSubmitTests
     {
         public const string HomePage = "https://hello.raklet.net/";
         public string LoginEmail = "perbil18@ku.edu.tr";
